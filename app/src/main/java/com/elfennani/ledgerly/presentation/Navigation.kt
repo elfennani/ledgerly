@@ -9,8 +9,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -75,10 +77,11 @@ fun Navigation() {
                 restoreState = true
             }
         }
-    ) {
+    ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = HomeRoute,
+            modifier = Modifier.padding(innerPadding),
             enterTransition = {
                 fadeIn() + slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
