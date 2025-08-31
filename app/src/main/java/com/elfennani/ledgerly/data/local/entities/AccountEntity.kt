@@ -1,10 +1,11 @@
 package com.elfennani.ledgerly.data.local.entities
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity(tableName = "accounts")
 data class AccountEntity(
-    val id: String,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
     val balance: Double
 )
