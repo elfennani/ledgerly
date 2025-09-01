@@ -20,7 +20,7 @@ import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Tab
 import com.elfennani.ledgerly.presentation.scenes.home.HomeRoute
 import com.elfennani.ledgerly.presentation.scenes.products.ProductListRoute
-import com.elfennani.ledgerly.presentation.theme.LedgerlyTheme
+import com.elfennani.ledgerly.presentation.theme.AppTheme
 
 @Composable
 fun AppScaffold(
@@ -68,7 +68,7 @@ fun AppScaffold(
 @Preview
 @Composable
 private fun AppScaffoldPreview() {
-    LedgerlyTheme {
+    AppTheme {
         AppScaffold(
             selected = {
                 it.route == HomeRoute

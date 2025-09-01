@@ -30,6 +30,7 @@ import com.elfennani.ledgerly.domain.model.Account
 import com.elfennani.ledgerly.presentation.component.AccountCard
 import com.elfennani.ledgerly.presentation.component.GroupCard
 import com.elfennani.ledgerly.presentation.scenes.products.ProductListRoute
+import com.elfennani.ledgerly.presentation.theme.AppTheme
 
 private const val TAG = "HomeScreen"
 
@@ -164,5 +165,7 @@ private fun HomeScreen(
 @Preview
 @Composable
 private fun HomeScreenPreview() {
-    HomeScreen(state = HomeUiState())
+    AppTheme {
+        HomeScreen(state = HomeUiState())
+    }
 }

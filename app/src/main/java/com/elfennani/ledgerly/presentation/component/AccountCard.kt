@@ -23,7 +23,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.elfennani.ledgerly.domain.model.Account
-import com.elfennani.ledgerly.presentation.theme.LedgerlyTheme
+import com.elfennani.ledgerly.presentation.theme.AppTheme
 
 @Composable
 fun AccountCard(
@@ -88,7 +88,7 @@ fun AccountCard(
 )
 @Composable
 private fun AccountCardPreview() {
-    LedgerlyTheme {
+    AppTheme {
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)

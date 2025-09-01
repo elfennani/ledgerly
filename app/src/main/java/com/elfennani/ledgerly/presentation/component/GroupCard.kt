@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Account
-import com.elfennani.ledgerly.presentation.theme.LedgerlyTheme
+import com.elfennani.ledgerly.presentation.theme.AppTheme
 
 @Composable
 fun GroupCard(
@@ -90,7 +90,7 @@ fun GroupCard(
 @Preview
 @Composable
 fun GroupCardPreview() {
-    LedgerlyTheme {
+    AppTheme {
         Column(
             modifier = Modifier
                 .fillMaxSize()

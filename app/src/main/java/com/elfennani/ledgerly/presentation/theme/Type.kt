@@ -1,34 +1,84 @@
 package com.elfennani.ledgerly.presentation.theme
 
 import androidx.compose.material3.Typography
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import com.elfennani.ledgerly.R
 
-// Set of Material typography styles to start with
-val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+val interFont = FontFamily(
+    listOf(
+        Font(R.font.inter, FontWeight.W400),
+        Font(R.font.inter_medium, FontWeight.W500),
+        Font(R.font.inter_semibold, FontWeight.W600),
+        Font(R.font.inter_bold, FontWeight.W700),
     )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
 )
+
+val interTightFont = FontFamily(
+    listOf(
+        Font(R.font.inter_tight, FontWeight.W400),
+        Font(R.font.inter_tight_medium, FontWeight.W500),
+        Font(R.font.inter_tight_semibold, FontWeight.W600),
+        Font(R.font.inter_tight_bold, FontWeight.W700),
+    )
+)
+
+val bodyFontFamily = interFont
+
+val displayFontFamily = interTightFont
+
+// Default Material 3 typography values
+val baseline = Typography()
+
+val AppTypography = Typography(
+    displayLarge = baseline.displayLarge.copy(
+        fontFamily = displayFontFamily,
+        fontWeight = FontWeight.W600
+    ),
+    displayMedium = baseline.displayMedium.copy(
+        fontFamily = displayFontFamily,
+        fontWeight = FontWeight.W600
+    ),
+    displaySmall = baseline.displaySmall.copy(
+        fontFamily = displayFontFamily,
+        fontWeight = FontWeight.W600
+    ),
+    headlineLarge = baseline.headlineLarge.copy(
+        fontFamily = displayFontFamily,
+        fontWeight = FontWeight.W600
+    ),
+    headlineMedium = baseline.headlineMedium.copy(
+        fontFamily = displayFontFamily,
+        fontWeight = FontWeight.W600
+    ),
+    headlineSmall = baseline.headlineSmall.copy(
+        fontFamily = displayFontFamily,
+        fontWeight = FontWeight.W600
+    ),
+    titleLarge = baseline.titleLarge.copy(
+        fontFamily = displayFontFamily,
+        fontWeight = FontWeight.W600
+    ),
+    titleMedium = baseline.titleMedium.copy(
+        fontFamily = displayFontFamily,
+        fontWeight = FontWeight.W500
+    ),
+    titleSmall = baseline.titleSmall.copy(
+        fontFamily = displayFontFamily,
+        fontWeight = FontWeight.W500
+    ),
+    bodyLarge = baseline.bodyLarge.copy(fontFamily = bodyFontFamily),
+    bodyMedium = baseline.bodyMedium.copy(fontFamily = bodyFontFamily),
+    bodySmall = baseline.bodySmall.copy(fontFamily = bodyFontFamily),
+    labelLarge = baseline.labelLarge.copy(
+        fontFamily = bodyFontFamily,
+        fontWeight = FontWeight.W500
+    ),
+    labelMedium = baseline.labelMedium.copy(
+        fontFamily = bodyFontFamily,
+        fontWeight = FontWeight.W500
+    ),
+    labelSmall = baseline.labelSmall.copy(fontFamily = bodyFontFamily, fontWeight = FontWeight.W500)
+)
+
