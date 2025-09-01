@@ -7,6 +7,8 @@ data class HomeUiState(
     val isLoading: Boolean = false,
     val accounts: List<Account> = emptyList(),
     val selectedAccount: Int? = null,
+    val toDeleteAccount: Int? = null,
+    val editingAccount: Int? = null,
     val isCreateAccountModalVisible: Boolean = false,
     val formState: AccountFormState = AccountFormState()
 )

@@ -42,6 +42,7 @@ import com.elfennani.ledgerly.presentation.theme.AppTheme
 @Composable
 fun CreateAccountModal(
     modifier: Modifier = Modifier,
+    title: String = "Create Account",
     sheetState: SheetState = rememberModalBottomSheetState(true),
     formState: AccountFormState,
     onEvent: (HomeEvent) -> Unit = {},
@@ -74,7 +75,7 @@ fun CreateAccountModal(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                "Create Account",
+                title,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center

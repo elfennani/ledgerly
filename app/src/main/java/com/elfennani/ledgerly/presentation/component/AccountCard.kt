@@ -14,6 +14,8 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.elfennani.ledgerly.domain.model.Account
 import com.elfennani.ledgerly.presentation.theme.AppTheme
+import com.elfennani.ledgerly.presentation.utils.pretty
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -48,16 +51,18 @@ fun AccountCard(
                 MaterialTheme.typography.labelSmall.toSpanStyle().copy(color = Color.Gray)
             val currentBalanceStyle = MaterialTheme.typography.titleMedium.toSpanStyle()
                 .copy(color = MaterialTheme.colorScheme.primary)
-            val balance = remember {
-                buildAnnotatedString {
-                    withStyle(currentBalanceStyle) {
-                        append("$")
-                        append(String.format("%.2f", account.balance))
-                    }
-                    withStyle(style = totalStyle) {
-                        append(
-                            " / $${String.format("%.2f", (account.balance / 0.75))}"
-                        )
+            val balance by remember(account.balance) {
+                derivedStateOf {
+                    buildAnnotatedString {
+                        withStyle(currentBalanceStyle) {
+                            append("$")
+                            append(account.balance.pretty)
+                        }
+                        withStyle(style = totalStyle) {
+                            append(
+                                " / $${account.balance.pretty}"
+                            )
+                        }
                     }
                 }
             }
@@ -80,7 +85,7 @@ fun AccountCard(
         }
 
         LinearProgressIndicator(
-            progress = { 0.75f },
+            progress = { 1f },
             modifier = Modifier.fillMaxWidth(),
             drawStopIndicator = {}
         )
@@ -102,7 +107,7 @@ private fun AccountCardPreview() {
                 account = Account(
                     id = 1,
                     name = "Checking Account with a very long name",
-                    balance = 9876.54
+                    balance = 9876.00
                 )
             )
         }

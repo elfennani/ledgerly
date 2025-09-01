@@ -30,7 +30,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +48,8 @@ import com.elfennani.ledgerly.presentation.component.AccountCard
 import com.elfennani.ledgerly.presentation.component.GroupCard
 import com.elfennani.ledgerly.presentation.scene.home.component.AccountDetailsModal
 import com.elfennani.ledgerly.presentation.scene.home.component.CreateAccountModal
+import com.elfennani.ledgerly.presentation.scene.home.component.DeleteAccountDialog
+import com.elfennani.ledgerly.presentation.scene.home.component.EditAccountModal
 import com.elfennani.ledgerly.presentation.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -79,6 +83,7 @@ private fun HomeScreen(
     ) { innerPadding ->
         val createAccountModalState = rememberModalBottomSheetState(true)
         val accountDetailsModalState = rememberModalBottomSheetState(true)
+        val editAccountModalState = rememberModalBottomSheetState(true)
         val scope = rememberCoroutineScope()
 
         if (state.isCreateAccountModalVisible) {
@@ -100,8 +105,28 @@ private fun HomeScreen(
                 onDismissRequest = {
                     scope.launch { accountDetailsModalState.hide() }
                         .invokeOnCompletion { onEvent(HomeEvent.DismissAccountDetailsModal) }
+                },
+                onEvent = onEvent
+            )
+        }
+
+        if (state.editingAccount != null) {
+            EditAccountModal(
+                formState = state.formState,
+                sheetState = editAccountModalState,
+                onEvent = onEvent,
+                onDismissRequest = {
+                    scope.launch { editAccountModalState.hide() }
+                        .invokeOnCompletion { onEvent(HomeEvent.DismissEditAccountModal) }
                 }
             )
+        }
+
+        if (state.toDeleteAccount != null) {
+            val account by remember {
+                derivedStateOf { state.accounts.first { it.id == state.toDeleteAccount } }
+            }
+            DeleteAccountDialog(account, onEvent)
         }
 
         if (state.isLoading) {
