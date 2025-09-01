@@ -47,6 +47,7 @@ import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Account
 import com.elfennani.ledgerly.presentation.component.AccountCard
 import com.elfennani.ledgerly.presentation.component.GroupCard
+import com.elfennani.ledgerly.presentation.scene.groups.GroupsRoute
 import com.elfennani.ledgerly.presentation.scene.home.component.AccountDetailsModal
 import com.elfennani.ledgerly.presentation.scene.home.component.CreateAccountModal
 import com.elfennani.ledgerly.presentation.scene.home.component.DeleteAccountDialog
@@ -64,7 +65,8 @@ fun HomeScreen(
     val state by viewModel.state.collectAsState()
     HomeScreen(
         state = state,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        onNavigateToGroups = { navController.navigate(GroupsRoute) }
     )
 }
 
@@ -72,7 +74,8 @@ fun HomeScreen(
 @Composable
 private fun HomeScreen(
     state: HomeUiState,
-    onEvent: (HomeEvent) -> Unit = {}
+    onEvent: (HomeEvent) -> Unit = {},
+    onNavigateToGroups: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -222,7 +225,7 @@ private fun HomeScreen(
                         )
 
                         TextButton(
-                            onClick = { onEvent(HomeEvent.ShowCreateAccountModal) },
+                            onClick = { onNavigateToGroups() },
                             contentPadding = PaddingValues(horizontal = 12.dp)
                         ) {
                             Icon(

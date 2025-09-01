@@ -26,4 +26,8 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideAccountDao(database: AppDatabase) = database.accountDao()
+
+    @Provides
+    @Singleton
+    fun provideGroupDao(database: AppDatabase) = database.groupDao()
 }
