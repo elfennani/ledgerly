@@ -1,0 +1,5 @@
+package com.elfennani.ledgerly.domain.model
+
+data class HomeOverview(
+    val accounts: List<Account>
+)

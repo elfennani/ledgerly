@@ -23,12 +23,12 @@ import androidx.navigation.compose.rememberNavController
 import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Tab
 import com.elfennani.ledgerly.presentation.component.AppScaffold
-import com.elfennani.ledgerly.presentation.scenes.home.HomeRoute
-import com.elfennani.ledgerly.presentation.scenes.home.HomeScreen
-import com.elfennani.ledgerly.presentation.scenes.products.ProductListRoute
-import com.elfennani.ledgerly.presentation.scenes.products.ProductListScreen
-import com.elfennani.ledgerly.presentation.scenes.transactions.TransactionListRoute
-import com.elfennani.ledgerly.presentation.scenes.transactions.TransactionListScreen
+import com.elfennani.ledgerly.presentation.scene.home.HomeRoute
+import com.elfennani.ledgerly.presentation.scene.home.HomeScreen
+import com.elfennani.ledgerly.presentation.scene.products.ProductListRoute
+import com.elfennani.ledgerly.presentation.scene.products.ProductListScreen
+import com.elfennani.ledgerly.presentation.scene.transactions.TransactionListRoute
+import com.elfennani.ledgerly.presentation.scene.transactions.TransactionListScreen
 import kotlin.math.roundToInt
 
 private const val TAG = "Navigation"

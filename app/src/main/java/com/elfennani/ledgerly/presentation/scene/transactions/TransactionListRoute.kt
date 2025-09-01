@@ -1,4 +1,4 @@
-package com.elfennani.ledgerly.presentation.scenes.transactions
+package com.elfennani.ledgerly.presentation.scene.transactions
 
 import kotlinx.serialization.Serializable
 

@@ -18,8 +18,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Tab
-import com.elfennani.ledgerly.presentation.scenes.home.HomeRoute
-import com.elfennani.ledgerly.presentation.scenes.products.ProductListRoute
+import com.elfennani.ledgerly.presentation.scene.home.HomeRoute
+import com.elfennani.ledgerly.presentation.scene.products.ProductListRoute
 import com.elfennani.ledgerly.presentation.theme.AppTheme
 
 @Composable

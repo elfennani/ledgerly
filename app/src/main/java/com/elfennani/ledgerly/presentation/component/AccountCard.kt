@@ -1,5 +1,6 @@
 package com.elfennani.ledgerly.presentation.component
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.elfennani.ledgerly.domain.model.Account
 import com.elfennani.ledgerly.presentation.theme.AppTheme
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun AccountCard(
     modifier: Modifier = Modifier,
@@ -50,10 +52,12 @@ fun AccountCard(
                 buildAnnotatedString {
                     withStyle(currentBalanceStyle) {
                         append("$")
-                        append(account.balance.toString())
+                        append(String.format("%.2f", account.balance))
                     }
                     withStyle(style = totalStyle) {
-                        append(" / $${account.balance / 0.75}")
+                        append(
+                            " / $${String.format("%.2f", (account.balance / 0.75))}"
+                        )
                     }
                 }
             }
@@ -98,7 +102,7 @@ private fun AccountCardPreview() {
                 account = Account(
                     id = 1,
                     name = "Checking Account with a very long name",
-                    balance = 1234.56
+                    balance = 9876.54
                 )
             )
         }

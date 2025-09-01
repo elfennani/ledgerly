@@ -1,4 +1,4 @@
-package com.elfennani.ledgerly.presentation.scenes.products
+package com.elfennani.ledgerly.presentation.scene.products
 
 import kotlinx.serialization.Serializable
 

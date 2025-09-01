@@ -1,4 +1,4 @@
-package com.elfennani.ledgerly.presentation.scenes.home
+package com.elfennani.ledgerly.presentation.scene.transactions
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(): ViewModel(){
+class TransactionListViewModel @Inject constructor() : ViewModel() {
 
-    private val _state = MutableStateFlow(HomeUiState())
+    private val _state = MutableStateFlow(TransactionListUiState())
     val state = _state.asStateFlow()
 
 }

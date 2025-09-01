@@ -1,4 +1,4 @@
-package com.elfennani.ledgerly.presentation.scenes.transactions
+package com.elfennani.ledgerly.presentation.scene.products
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,30 +14,30 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 
 @Composable
-fun TransactionListScreen(
+fun ProductListScreen(
     navController: NavController,
-    viewModel: TransactionListViewModel = hiltViewModel()
+    viewModel: ProductListViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    TransactionListScreen(
+    ProductListScreen(
         state = state
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TransactionListScreen(
-    state: TransactionListUiState
+private fun ProductListScreen(
+    state: ProductListUiState
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("TransactionList") }
+                title = { Text("ProductList") }
             )
         }
     ) { innerPadding ->
         Text(
-            text = "Welcome to the TransactionList Screen",
+            text = "Welcome to the ProductList Screen",
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -45,6 +45,6 @@ private fun TransactionListScreen(
 
 @Preview
 @Composable
-private fun TransactionListScreenPreview() {
-    TransactionListScreen(state = TransactionListUiState())
+private fun ProductListScreenPreview() {
+    ProductListScreen(state = ProductListUiState())
 }
