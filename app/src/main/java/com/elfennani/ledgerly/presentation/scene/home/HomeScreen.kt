@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -208,11 +209,31 @@ private fun HomeScreen(
                 }
 
                 item {
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        "Categories",
-                        style = MaterialTheme.typography.labelLarge
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                    ) {
+                        Text(
+                            "Groups",
+                            style = MaterialTheme.typography.labelLarge
+                        )
+
+                        TextButton(
+                            onClick = { onEvent(HomeEvent.ShowCreateAccountModal) },
+                            contentPadding = PaddingValues(horizontal = 12.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.adjustments_horizontal),
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text("Manage")
+                        }
+                    }
                 }
 
 

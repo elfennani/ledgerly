@@ -23,6 +23,8 @@ import androidx.navigation.compose.rememberNavController
 import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Tab
 import com.elfennani.ledgerly.presentation.component.AppScaffold
+import com.elfennani.ledgerly.presentation.scene.groups.GroupsRoute
+import com.elfennani.ledgerly.presentation.scene.groups.GroupsScreen
 import com.elfennani.ledgerly.presentation.scene.home.HomeRoute
 import com.elfennani.ledgerly.presentation.scene.home.HomeScreen
 import com.elfennani.ledgerly.presentation.scene.products.ProductListRoute
@@ -135,6 +137,11 @@ fun Navigation() {
                 popExitTransition = { ExitTransition.None }
             ) {
                 TransactionListScreen(navController = navController)
+            }
+            composable<GroupsRoute> {
+                GroupsScreen(
+                    navController = navController
+                )
             }
         }
     }
