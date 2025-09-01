@@ -44,6 +44,7 @@ import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Account
 import com.elfennani.ledgerly.presentation.component.AccountCard
 import com.elfennani.ledgerly.presentation.component.GroupCard
+import com.elfennani.ledgerly.presentation.scene.home.component.AccountDetailsModal
 import com.elfennani.ledgerly.presentation.scene.home.component.CreateAccountModal
 import com.elfennani.ledgerly.presentation.theme.AppTheme
 import kotlinx.coroutines.launch
@@ -76,17 +77,29 @@ private fun HomeScreen(
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Top)
     ) { innerPadding ->
-        val modalState = rememberModalBottomSheetState(true)
+        val createAccountModalState = rememberModalBottomSheetState(true)
+        val accountDetailsModalState = rememberModalBottomSheetState(true)
         val scope = rememberCoroutineScope()
 
         if (state.isCreateAccountModalVisible) {
             CreateAccountModal(
                 formState = state.formState,
-                sheetState = modalState,
+                sheetState = createAccountModalState,
                 onEvent = onEvent,
                 onDismissRequest = {
-                    scope.launch { modalState.hide() }
+                    scope.launch { createAccountModalState.hide() }
                         .invokeOnCompletion { onEvent(HomeEvent.DismissCreateAccountModal) }
+                }
+            )
+        }
+
+        if (state.selectedAccount != null) {
+            AccountDetailsModal(
+                sheetState = accountDetailsModalState,
+                account = state.accounts.first { it.id == state.selectedAccount },
+                onDismissRequest = {
+                    scope.launch { accountDetailsModalState.hide() }
+                        .invokeOnCompletion { onEvent(HomeEvent.DismissAccountDetailsModal) }
                 }
             )
         }
@@ -163,7 +176,9 @@ private fun HomeScreen(
                         account = account,
                         modifier = Modifier
                             .clip(MaterialTheme.shapes.small)
-                            .clickable {}
+                            .clickable {
+                                onEvent(HomeEvent.ShowAccountDetailsModal(account.id))
+                            }
                     )
                 }
 

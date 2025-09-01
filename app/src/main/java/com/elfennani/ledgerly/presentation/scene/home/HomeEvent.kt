@@ -4,6 +4,8 @@ sealed class HomeEvent {
     // Modal Events
     data object ShowCreateAccountModal : HomeEvent()
     data object DismissCreateAccountModal : HomeEvent()
+    data class ShowAccountDetailsModal(val accountId: Int) : HomeEvent()
+    data object DismissAccountDetailsModal : HomeEvent()
 
     // Form Events
     data class OnAccountNameChange(val name: String) : HomeEvent()

@@ -112,6 +112,22 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
+
+            HomeEvent.DismissAccountDetailsModal -> {
+                _state.update {
+                    it.copy(
+                        selectedAccount = null,
+                    )
+                }
+            }
+
+            is HomeEvent.ShowAccountDetailsModal -> {
+                _state.update {
+                    it.copy(
+                        selectedAccount = event.accountId,
+                    )
+                }
+            }
         }
     }
 
