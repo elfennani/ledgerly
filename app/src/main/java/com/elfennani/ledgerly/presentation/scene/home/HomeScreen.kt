@@ -39,12 +39,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Account
+import com.elfennani.ledgerly.domain.model.Group
 import com.elfennani.ledgerly.presentation.component.AccountCard
 import com.elfennani.ledgerly.presentation.component.GroupCard
 import com.elfennani.ledgerly.presentation.scene.groups.GroupsRoute
@@ -239,32 +241,19 @@ private fun HomeScreen(
                     }
                 }
 
-
-                item {
-                    GroupCard(title = "🧾 Bills") {
-                        AccountCard(
-                            account = Account(
-                                id = 1,
-                                name = "🛒 Groceries",
-                                balance = 1234.56
-                            ),
-                            modifier = Modifier.clickable {}
-                        )
-                        AccountCard(
-                            account = Account(
-                                id = 1,
-                                name = "🌎 Internet",
-                                balance = 55.56
-                            ),
-                            modifier = Modifier.clickable {}
-                        )
-                        AccountCard(
-                            account = Account(
-                                id = 1,
-                                name = "🎶 Music",
-                                balance = 1435.56
-                            ),
-                            modifier = Modifier.clickable {}
+                items(state.groups) {
+                    GroupCard(
+                        title = it.name,
+                        collapsed = it.collapsed,
+                        onToggleCollapse = { onEvent(HomeEvent.ToggleGroupCollapsed(it.id)) }
+                    ) {
+                        Text(
+                            "No categories in this group.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
                         )
                     }
                 }
@@ -284,6 +273,9 @@ private fun HomeScreenPreview() {
                     Account(id = 2, name = "Savings", balance = 9876.54),
                     Account(id = 3, name = "Credit Card", balance = 123.45)
                 ),
+                groups = listOf(
+                    Group(id = 1, name = "Bills", index = 0)
+                )
             )
         )
     }

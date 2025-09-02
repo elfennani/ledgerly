@@ -20,4 +20,7 @@ sealed class HomeEvent {
     data class DeleteAccount(val accountId: Int) : HomeEvent()
     data class ConfirmDeleteAccount(val accountId: Int) : HomeEvent()
     data object CancelDeleteAccount : HomeEvent()
+
+    // Group Events
+    data class ToggleGroupCollapsed(val groupId: Int) : HomeEvent()
 }

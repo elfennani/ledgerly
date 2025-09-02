@@ -21,9 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,10 +37,10 @@ import com.elfennani.ledgerly.presentation.theme.AppTheme
 fun GroupCard(
     modifier: Modifier = Modifier,
     title: String,
-    defaultCollapsed: Boolean = true,
+    collapsed: Boolean = false,
+    onToggleCollapse: () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
-    var collapsed by remember { mutableStateOf(defaultCollapsed) }
     val rotation by animateFloatAsState(targetValue = if (!collapsed) 180f else 0f)
 
     Column(
@@ -56,7 +53,7 @@ fun GroupCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { collapsed = !collapsed }
+                    .clickable { onToggleCollapse() }
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.Absolute.SpaceBetween,
@@ -64,7 +61,7 @@ fun GroupCard(
             ) {
                 Text(text = title, style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
                 IconButton(
-                    onClick = { collapsed = !collapsed },
+                    onClick = { onToggleCollapse() },
                     modifier = Modifier
                         .size(32.dp)
                         .rotate(rotation)
@@ -73,13 +70,7 @@ fun GroupCard(
                 }
             }
             AnimatedVisibility(visible = collapsed, modifier = Modifier.fillMaxWidth()) {
-                Column {
-//                    HorizontalDivider(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 16.dp),
-//                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
-//                    )
+                Column(Modifier.fillMaxWidth()) {
                     content()
                 }
             }

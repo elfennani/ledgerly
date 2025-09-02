@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.elfennani.ledgerly.domain.usecase.CreateAccountUseCase
 import com.elfennani.ledgerly.domain.usecase.DeleteAccountUseCase
 import com.elfennani.ledgerly.domain.usecase.GetHomeOverviewUseCase
+import com.elfennani.ledgerly.domain.usecase.ToggleGroupCollapsedUseCase
 import com.elfennani.ledgerly.domain.usecase.UpdateAccountUseCase
 import com.elfennani.ledgerly.presentation.scene.home.model.AccountFormState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,7 @@ class HomeViewModel @Inject constructor(
     private val createAccount: CreateAccountUseCase,
     private val deleteAccount: DeleteAccountUseCase,
     private val updateAccount: UpdateAccountUseCase,
+    private val toggleGroupCollapsed: ToggleGroupCollapsedUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState())
     val state = _state.asStateFlow()
@@ -32,7 +34,8 @@ class HomeViewModel @Inject constructor(
                 _state.update { currentState ->
                     currentState.copy(
                         isLoading = false,
-                        accounts = it.accounts
+                        accounts = it.accounts,
+                        groups = it.groups
                     )
                 }
             }
@@ -223,6 +226,12 @@ class HomeViewModel @Inject constructor(
                             }
                         }
                     }
+                }
+            }
+
+            is HomeEvent.ToggleGroupCollapsed -> {
+                viewModelScope.launch {
+                    toggleGroupCollapsed(event.groupId)
                 }
             }
         }
