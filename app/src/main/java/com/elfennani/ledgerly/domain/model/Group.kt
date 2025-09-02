@@ -5,5 +5,5 @@ data class Group(
     val name: String,
     val collapsed: Boolean = false,
     val categories: List<Category>? = null,
-    val index: Int = 0
+    val index: Int = 0,
 )

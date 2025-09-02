@@ -10,21 +10,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Account
 import com.elfennani.ledgerly.presentation.theme.AppTheme
 import com.elfennani.ledgerly.presentation.utils.pretty
@@ -38,57 +36,137 @@ fun AccountCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.small)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.large)
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            val totalStyle =
-                MaterialTheme.typography.labelSmall.toSpanStyle().copy(color = Color.Gray)
-            val currentBalanceStyle = MaterialTheme.typography.titleMedium.toSpanStyle()
-                .copy(color = MaterialTheme.colorScheme.primary)
-            val balance by remember(account.balance) {
-                derivedStateOf {
-                    buildAnnotatedString {
-                        withStyle(currentBalanceStyle) {
-                            append("$")
-                            append(account.balance.pretty)
-                        }
-                        withStyle(style = totalStyle) {
-                            append(
-                                " / $${account.balance.pretty}"
-                            )
-                        }
-                    }
-                }
-            }
-
-            Text(
-                account.name,
-                style = MaterialTheme.typography.titleMedium,
+            Row(
                 modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.wallet),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    account.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Text(
-                text = balance,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    "Balance",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 11.sp
+                )
+                Text(
+                    text = "$${account.balance.pretty}",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontFeatureSettings = "tnum"
+                    ),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
 
-        LinearProgressIndicator(
-            progress = { 1f },
-            modifier = Modifier.fillMaxWidth(),
-            drawStopIndicator = {}
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    "01 / 03",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontFeatureSettings = "tnum"
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    "Groceries",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(0.5f),
+                )
+                Text(
+                    "- $76.45",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontFeatureSettings = "tnum"
+                    ),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.weight(0.3f),
+                    textAlign = TextAlign.End
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    "12 / 03",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontFeatureSettings = "tnum"
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    "All Subscriptions",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(0.5f),
+                )
+                Text(
+                    "- $49",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontFeatureSettings = "tnum"
+                    ),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.weight(0.3f),
+                    textAlign = TextAlign.End
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    "24 / 04",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontFeatureSettings = "tnum"
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    "Paycheck",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    "+ $100",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontFeatureSettings = "tnum"
+                    ),
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.End
+                )
+            }
+        }
     }
 }
 
@@ -106,7 +184,7 @@ private fun AccountCardPreview() {
             AccountCard(
                 account = Account(
                     id = 1,
-                    name = "Checking Account with a very long name",
+                    name = "Checking Account",
                     balance = 9876.00
                 )
             )

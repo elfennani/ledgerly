@@ -2,6 +2,7 @@ package com.elfennani.ledgerly.presentation.scene.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,17 +13,19 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -39,12 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -61,7 +59,6 @@ import com.elfennani.ledgerly.presentation.scene.home.component.CreateCategoryMo
 import com.elfennani.ledgerly.presentation.scene.home.component.DeleteAccountDialog
 import com.elfennani.ledgerly.presentation.scene.home.component.EditAccountModal
 import com.elfennani.ledgerly.presentation.theme.AppTheme
-import com.elfennani.ledgerly.presentation.utils.pretty
 import kotlinx.coroutines.launch
 
 private const val TAG = "HomeScreen"
@@ -99,6 +96,9 @@ private fun HomeScreen(
         val editAccountModalState = rememberModalBottomSheetState(true)
         val createCategoryModalState = rememberModalBottomSheetState(true)
         val scope = rememberCoroutineScope()
+        val pagerState = rememberPagerState(
+            pageCount = { state.accounts.size }
+        )
 
         if (state.isCreateAccountModalVisible) {
             CreateAccountModal(
@@ -169,15 +169,18 @@ private fun HomeScreen(
         } else {
             LazyColumn(
                 modifier = Modifier
-                    .padding(innerPadding),
+                    .padding(innerPadding)
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(16.dp)
+                contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 item {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
                     ) {
                         Text(
                             "Accounts",
@@ -187,7 +190,8 @@ private fun HomeScreen(
                         if (state.accounts.isNotEmpty())
                             TextButton(
                                 onClick = { onEvent(HomeEvent.ShowCreateAccountModal) },
-                                contentPadding = PaddingValues(horizontal = 12.dp)
+                                contentPadding = PaddingValues(horizontal = 12.dp),
+                                modifier = Modifier.offset(x = 12.dp)
                             ) {
                                 Icon(painterResource(R.drawable.plus_small), null)
                                 Spacer(Modifier.width(4.dp))
@@ -197,10 +201,14 @@ private fun HomeScreen(
                 }
 
                 if (state.accounts.isEmpty()) {
-                    item {
+                    item(
+                        key = "no_accounts",
+                        contentType = "no_accounts"
+                    ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
                                 .background(
                                     MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                                     MaterialTheme.shapes.medium
@@ -221,17 +229,31 @@ private fun HomeScreen(
                             }
                         }
                     }
-                }
+                } else {
+                    item(
+                        key = "accounts_pager",
+                        contentType = "accounts_pager"
+                    ) {
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier,
+                            pageSpacing = 8.dp,
+                            snapPosition = SnapPosition.Center,
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                        ) {
+                            val account = state.accounts[it]
 
-                items(state.accounts) { account ->
-                    AccountCard(
-                        account = account,
-                        modifier = Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .clickable {
-                                onEvent(HomeEvent.ShowAccountDetailsModal(account.id))
-                            }
-                    )
+                            AccountCard(
+                                account = account,
+                                modifier = Modifier
+                                    .clip(MaterialTheme.shapes.small)
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onEvent(HomeEvent.ShowAccountDetailsModal(account.id))
+                                    }
+                            )
+                        }
+                    }
                 }
 
                 item {
@@ -241,6 +263,7 @@ private fun HomeScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp)
+                            .padding(horizontal = 16.dp)
                     ) {
                         Text(
                             "Groups",
@@ -249,7 +272,8 @@ private fun HomeScreen(
 
                         TextButton(
                             onClick = { onNavigateToGroups() },
-                            contentPadding = PaddingValues(horizontal = 12.dp)
+                            contentPadding = PaddingValues(horizontal = 12.dp),
+                            modifier = Modifier.offset(x = 12.dp)
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.adjustments_horizontal),
@@ -264,86 +288,17 @@ private fun HomeScreen(
 
                 items(state.groups) {
                     GroupCard(
-                        title = it.name,
-                        collapsed = it.collapsed,
-                        onToggleCollapse = { onEvent(HomeEvent.ToggleGroupCollapsed(it.id)) },
-                        onAdd = { onEvent(HomeEvent.ShowCreateCategoryModal(it.id)) }
-                    ) {
-                        if (it.categories == null || it.categories.isEmpty()) {
-                            Text(
-                                "No categories in this group.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                            )
-                        } else {
-                            for (category in it.categories) {
-                                Column(
-                                    modifier = Modifier
-                                        .clickable {}
-                                        .fillMaxWidth()
-                                        .background(
-                                            MaterialTheme.colorScheme.surfaceContainer,
-                                            MaterialTheme.shapes.small
-                                        )
-                                        .padding(16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.Top,
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        val totalStyle =
-                                            MaterialTheme.typography.labelSmall.toSpanStyle()
-                                                .copy(color = Color.Gray)
-                                        val currentBalanceStyle =
-                                            MaterialTheme.typography.titleMedium.toSpanStyle()
-                                                .copy(color = MaterialTheme.colorScheme.primary)
-                                        val balance by remember(category.target) {
-                                            derivedStateOf {
-                                                buildAnnotatedString {
-                                                    withStyle(currentBalanceStyle) {
-                                                        append("$")
-                                                        append(category.target?.pretty)
-                                                    }
-                                                    withStyle(style = totalStyle) {
-                                                        append(
-                                                            " / $${category.target?.pretty}"
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        Text(
-                                            category.name,
-                                            style = MaterialTheme.typography.titleMedium,
-                                            modifier = Modifier.weight(1f),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            color = MaterialTheme.colorScheme.onSurface
-                                        )
-
-                                        Spacer(modifier = Modifier.width(8.dp))
-
-                                        Text(
-                                            text = balance,
-                                            style = MaterialTheme.typography.titleMedium
-                                        )
-                                    }
-
-                                    LinearProgressIndicator(
-                                        progress = { 1f },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        drawStopIndicator = {}
-                                    )
-                                }
-                            }
-                        }
-                    }
+                        group = it,
+                        onAdd = {
+                            onEvent(HomeEvent.ShowCreateCategoryModal(it.id))
+                        },
+                        onToggleCollapse = {
+                            onEvent(HomeEvent.ToggleGroupCollapsed(it.id))
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    )
                 }
             }
         }

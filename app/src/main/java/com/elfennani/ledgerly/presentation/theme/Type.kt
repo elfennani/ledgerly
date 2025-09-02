@@ -61,11 +61,11 @@ val AppTypography = Typography(
         fontWeight = FontWeight.W600
     ),
     titleMedium = baseline.titleMedium.copy(
-        fontFamily = displayFontFamily,
+        fontFamily = bodyFontFamily,
         fontWeight = FontWeight.W500
     ),
     titleSmall = baseline.titleSmall.copy(
-        fontFamily = displayFontFamily,
+        fontFamily = bodyFontFamily,
         fontWeight = FontWeight.W500
     ),
     bodyLarge = baseline.bodyLarge.copy(fontFamily = bodyFontFamily),
