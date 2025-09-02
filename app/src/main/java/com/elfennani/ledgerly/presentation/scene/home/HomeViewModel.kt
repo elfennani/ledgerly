@@ -24,7 +24,7 @@ class HomeViewModel @Inject constructor(
     private val updateAccount: UpdateAccountUseCase,
     private val toggleGroupCollapsed: ToggleGroupCollapsedUseCase
 ) : ViewModel() {
-    private val _state = MutableStateFlow(HomeUiState())
+    private val _state = MutableStateFlow(HomeUiState(isLoading = true))
     val state = _state.asStateFlow()
 
     init {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -143,6 +144,7 @@ private fun GroupsScreen(
         } else {
             LazyColumn(
                 modifier = Modifier
+                    .fillMaxSize()
                     .dragGroupHandler(dragState, state.groups) { from, to ->
                         lastDraggedGroupId = state.groups.getOrNull(from)?.id
                         onEvent(GroupsEvent.MoveGroup(from, to))
@@ -206,11 +208,14 @@ private fun GroupsScreen(
                         onDeleteClick = { onEvent(GroupsEvent.DeleteGroup(group.id)) }
                     )
                 }
-                item {
+                item(
+                    key = "add_button"
+                ) {
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 16.dp),
+                            .padding(top = 16.dp)
+                            .animateItem(),
                         contentPadding = PaddingValues(vertical = 16.dp),
                         onClick = { onEvent(GroupsEvent.ShowAddGroupModal) },
                     ) {

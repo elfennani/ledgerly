@@ -24,9 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,11 +78,8 @@ fun EditGroupModal(
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
-                value = TextFieldValue(
-                    text = formState.name,
-                    selection = TextRange(formState.name.length)
-                ),
-                onValueChange = { onEvent(GroupsEvent.OnGroupNameChanged(it.text)) },
+                value = formState.name,
+                onValueChange = { onEvent(GroupsEvent.OnGroupNameChanged(it)) },
                 placeholder = { Text("e.g. Bills") },
                 label = { Text("Nickname") },
                 shape = MaterialTheme.shapes.small,

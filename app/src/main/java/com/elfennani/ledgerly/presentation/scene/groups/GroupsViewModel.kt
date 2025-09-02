@@ -1,5 +1,7 @@
 package com.elfennani.ledgerly.presentation.scene.groups
 
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elfennani.ledgerly.domain.usecase.CreateGroupUseCase
@@ -76,7 +78,10 @@ class GroupsViewModel @Inject constructor(
                             editingGroupId = event.groupId,
                             isAddGroupDialogVisible = false,
                             groupFormState = GroupFormState(
-                                name = group.name
+                                name = TextFieldValue(
+                                    text = group.name,
+                                    selection = TextRange(group.name.length)
+                                )
                             )
                         )
                     }
@@ -87,7 +92,7 @@ class GroupsViewModel @Inject constructor(
                 viewModelScope.launch {
                     _state.update { it.copy(groupFormState = it.groupFormState.copy(isSubmitting = true)) }
                     val currentState = _state.value
-                    val name = currentState.groupFormState.name.trim()
+                    val name = currentState.groupFormState.name.text.trim()
 
                     if (name.isEmpty()) {
                         _state.update {
@@ -114,7 +119,7 @@ class GroupsViewModel @Inject constructor(
                 viewModelScope.launch {
                     _state.update { it.copy(groupFormState = it.groupFormState.copy(isSubmitting = true)) }
                     val currentState = _state.value
-                    val name = currentState.groupFormState.name.trim()
+                    val name = currentState.groupFormState.name.text.trim()
 
                     if (name.isEmpty()) {
                         _state.update {
