@@ -13,7 +13,8 @@ class GroupRepositoryImpl @Inject constructor(
     private val groupDao: GroupDao
 ) : GroupRepository {
     override val groupsFlow: Flow<List<Group>>
-        get() = groupDao.getAllGroupsFlow().map { it.map { group -> group.toDomain() } }
+        get() = groupDao.getAllGroupsWithCategoriesFlow()
+            .map { it.map { group -> group.toDomain() } }
 
     override suspend fun getGroupById(id: Int): Flow<Group?> {
         return groupDao.getGroupByIdFlow(id).map { it?.toDomain() }

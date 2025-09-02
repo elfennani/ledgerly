@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elfennani.ledgerly.domain.usecase.CreateAccountUseCase
+import com.elfennani.ledgerly.domain.usecase.CreateCategoryUseCase
 import com.elfennani.ledgerly.domain.usecase.DeleteAccountUseCase
 import com.elfennani.ledgerly.domain.usecase.GetHomeOverviewUseCase
 import com.elfennani.ledgerly.domain.usecase.ToggleGroupCollapsedUseCase
 import com.elfennani.ledgerly.domain.usecase.UpdateAccountUseCase
 import com.elfennani.ledgerly.presentation.scene.home.model.AccountFormState
+import com.elfennani.ledgerly.presentation.scene.home.model.CategoryFormState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +24,8 @@ class HomeViewModel @Inject constructor(
     private val createAccount: CreateAccountUseCase,
     private val deleteAccount: DeleteAccountUseCase,
     private val updateAccount: UpdateAccountUseCase,
-    private val toggleGroupCollapsed: ToggleGroupCollapsedUseCase
+    private val toggleGroupCollapsed: ToggleGroupCollapsedUseCase,
+    private val createCategory: CreateCategoryUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState(isLoading = true))
     val state = _state.asStateFlow()
@@ -48,7 +51,7 @@ class HomeViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isCreateAccountModalVisible = false,
-                        formState = AccountFormState()
+                        accountFormState = AccountFormState()
                     )
                 }
             }
@@ -58,13 +61,13 @@ class HomeViewModel @Inject constructor(
             }
 
             HomeEvent.SubmitCreateAccount -> {
-                val isError = with(state.value.formState) {
+                val isError = with(state.value.accountFormState) {
                     val nameError = isNameError(name)
                     val balanceError = isInitialBalanceError(initialBalance)
 
                     _state.update {
                         it.copy(
-                            formState = it.formState.copy(
+                            accountFormState = it.accountFormState.copy(
                                 nameError = nameError,
                                 initialBalanceError = balanceError
                             )
@@ -76,8 +79,14 @@ class HomeViewModel @Inject constructor(
 
                 if (!isError) {
                     viewModelScope.launch {
-                        val current = state.value.copy().formState
-                        _state.update { it.copy(formState = it.formState.copy(isSubmitting = true)) }
+                        val current = state.value.copy().accountFormState
+                        _state.update {
+                            it.copy(
+                                accountFormState = it.accountFormState.copy(
+                                    isSubmitting = true
+                                )
+                            )
+                        }
                         createAccount(
                             name = current.name,
                             initialBalance = current.initialBalance.toDouble(),
@@ -85,7 +94,7 @@ class HomeViewModel @Inject constructor(
                         )
                         _state.update {
                             it.copy(
-                                formState = it.formState.copy(
+                                accountFormState = it.accountFormState.copy(
                                     isSubmitting = false,
                                     isSuccess = true
                                 ),
@@ -96,14 +105,19 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeEvent.OnAccountDescriptionChange -> {
-                _state.update { it.copy(formState = it.formState.copy(description = event.description)) }
+                _state.update { it.copy(accountFormState = it.accountFormState.copy(description = event.description)) }
             }
 
             is HomeEvent.OnAccountNameChange -> {
                 _state.update {
                     val error = isNameError(event.name)
 
-                    it.copy(formState = it.formState.copy(name = event.name, nameError = error))
+                    it.copy(
+                        accountFormState = it.accountFormState.copy(
+                            name = event.name,
+                            nameError = error
+                        )
+                    )
                 }
             }
 
@@ -112,7 +126,7 @@ class HomeViewModel @Inject constructor(
                     val error = isInitialBalanceError(event.balance)
 
                     it.copy(
-                        formState = it.formState.copy(
+                        accountFormState = it.accountFormState.copy(
                             initialBalance = event.balance,
                             initialBalanceError = error
                         )
@@ -168,7 +182,7 @@ class HomeViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         editingAccount = null,
-                        formState = AccountFormState()
+                        accountFormState = AccountFormState()
                     )
                 }
             }
@@ -179,7 +193,7 @@ class HomeViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             editingAccount = event.accountId,
-                            formState = AccountFormState(
+                            accountFormState = AccountFormState(
                                 name = account.name,
                                 initialBalance = account.balance.toString(),
                                 description = account.description ?: ""
@@ -190,13 +204,13 @@ class HomeViewModel @Inject constructor(
             }
 
             HomeEvent.SubmitEditAccount -> {
-                val isError = with(state.value.formState) {
+                val isError = with(state.value.accountFormState) {
                     val nameError = isNameError(name)
                     val balanceError = isInitialBalanceError(initialBalance)
 
                     _state.update {
                         it.copy(
-                            formState = it.formState.copy(
+                            accountFormState = it.accountFormState.copy(
                                 nameError = nameError,
                                 initialBalanceError = balanceError
                             )
@@ -210,8 +224,14 @@ class HomeViewModel @Inject constructor(
                     val accountId = state.value.editingAccount
                     if (accountId != null) {
                         viewModelScope.launch {
-                            val current = state.value.copy().formState
-                            _state.update { it.copy(formState = it.formState.copy(isSubmitting = true)) }
+                            val current = state.value.copy().accountFormState
+                            _state.update {
+                                it.copy(
+                                    accountFormState = it.accountFormState.copy(
+                                        isSubmitting = true
+                                    )
+                                )
+                            }
                             updateAccount(
                                 accountId = accountId,
                                 name = current.name,
@@ -221,7 +241,7 @@ class HomeViewModel @Inject constructor(
                             _state.update {
                                 it.copy(
                                     editingAccount = null,
-                                    formState = AccountFormState()
+                                    accountFormState = AccountFormState()
                                 )
                             }
                         }
@@ -232,6 +252,102 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.ToggleGroupCollapsed -> {
                 viewModelScope.launch {
                     toggleGroupCollapsed(event.groupId)
+                }
+            }
+
+            HomeEvent.DismissCreateCategoryModal -> {
+                _state.update {
+                    it.copy(
+                        createCategoryGroupId = null,
+                        categoryFormState = CategoryFormState()
+                    )
+                }
+            }
+
+            is HomeEvent.OnCategoryNameChange -> {
+                _state.update {
+                    it.copy(
+                        categoryFormState = it.categoryFormState.copy(name = event.name)
+                    )
+                }
+            }
+
+            is HomeEvent.OnCategoryTargetChange -> {
+                _state.update {
+                    it.copy(
+                        categoryFormState = it.categoryFormState.copy(target = event.target)
+                    )
+                }
+            }
+
+            is HomeEvent.ShowCreateCategoryModal -> {
+                _state.update {
+                    it.copy(
+                        createCategoryGroupId = event.groupId,
+                        categoryFormState = CategoryFormState(groupId = event.groupId)
+                    )
+                }
+            }
+
+            HomeEvent.SubmitCreateCategory -> {
+                val groupId = state.value.createCategoryGroupId
+                if (groupId != null) {
+                    viewModelScope.launch {
+                        val current = state.value.categoryFormState
+
+                        if (current.name.text.isBlank()) {
+                            _state.update {
+                                it.copy(
+                                    categoryFormState = it.categoryFormState.copy(
+                                        nameError = "Name cannot be empty"
+                                    )
+                                )
+                            }
+                            return@launch
+                        }
+
+                        if (current.target.text.toDoubleOrNull() == null) {
+                            _state.update {
+                                it.copy(
+                                    categoryFormState = it.categoryFormState.copy(
+                                        targetError = "Invalid target amount"
+                                    )
+                                )
+                            }
+                            return@launch
+                        } else if (current.target.text.toDouble() < 0) {
+                            _state.update {
+                                it.copy(
+                                    categoryFormState = it.categoryFormState.copy(
+                                        targetError = "Target cannot be negative"
+                                    )
+                                )
+                            }
+                            return@launch
+                        }
+
+                        _state.update {
+                            it.copy(
+                                categoryFormState = it.categoryFormState.copy(
+                                    isSubmitting = true
+                                )
+                            )
+                        }
+                        createCategory(
+                            name = current.name.text,
+                            target = current.target.text.toDouble(),
+                            groupId = groupId
+                        )
+                        _state.update {
+                            it.copy(
+                                createCategoryGroupId = null,
+                                categoryFormState = it.categoryFormState.copy(
+                                    isSubmitting = false,
+                                    isSuccess = true
+                                )
+                            )
+                        }
+                    }
                 }
             }
         }

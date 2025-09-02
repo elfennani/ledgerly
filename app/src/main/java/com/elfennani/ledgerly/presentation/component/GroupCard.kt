@@ -8,16 +8,21 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -39,6 +44,7 @@ fun GroupCard(
     title: String,
     collapsed: Boolean = false,
     onToggleCollapse: () -> Unit = {},
+    onAdd: () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
     val rotation by animateFloatAsState(targetValue = if (!collapsed) 180f else 0f)
@@ -56,10 +62,28 @@ fun GroupCard(
                     .clickable { onToggleCollapse() }
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = title, style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 18.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                TextButton(
+                    onClick = { onAdd() },
+                    contentPadding = PaddingValues(horizontal = 12.dp),
+                    modifier = Modifier.height(32.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.plus_small),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text("Add")
+                }
                 IconButton(
                     onClick = { onToggleCollapse() },
                     modifier = Modifier

@@ -22,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -38,8 +39,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -52,9 +57,11 @@ import com.elfennani.ledgerly.presentation.component.GroupCard
 import com.elfennani.ledgerly.presentation.scene.groups.GroupsRoute
 import com.elfennani.ledgerly.presentation.scene.home.component.AccountDetailsModal
 import com.elfennani.ledgerly.presentation.scene.home.component.CreateAccountModal
+import com.elfennani.ledgerly.presentation.scene.home.component.CreateCategoryModal
 import com.elfennani.ledgerly.presentation.scene.home.component.DeleteAccountDialog
 import com.elfennani.ledgerly.presentation.scene.home.component.EditAccountModal
 import com.elfennani.ledgerly.presentation.theme.AppTheme
+import com.elfennani.ledgerly.presentation.utils.pretty
 import kotlinx.coroutines.launch
 
 private const val TAG = "HomeScreen"
@@ -90,11 +97,12 @@ private fun HomeScreen(
         val createAccountModalState = rememberModalBottomSheetState(true)
         val accountDetailsModalState = rememberModalBottomSheetState(true)
         val editAccountModalState = rememberModalBottomSheetState(true)
+        val createCategoryModalState = rememberModalBottomSheetState(true)
         val scope = rememberCoroutineScope()
 
         if (state.isCreateAccountModalVisible) {
             CreateAccountModal(
-                formState = state.formState,
+                formState = state.accountFormState,
                 sheetState = createAccountModalState,
                 onEvent = onEvent,
                 onDismissRequest = {
@@ -118,12 +126,25 @@ private fun HomeScreen(
 
         if (state.editingAccount != null) {
             EditAccountModal(
-                formState = state.formState,
+                formState = state.accountFormState,
                 sheetState = editAccountModalState,
                 onEvent = onEvent,
                 onDismissRequest = {
                     scope.launch { editAccountModalState.hide() }
                         .invokeOnCompletion { onEvent(HomeEvent.DismissEditAccountModal) }
+                }
+            )
+        }
+
+        if (state.createCategoryGroupId != null) {
+            CreateCategoryModal(
+                formState = state.categoryFormState,
+                groups = state.groups,
+                sheetState = createCategoryModalState,
+                onEvent = onEvent,
+                onDismissRequest = {
+                    scope.launch { createCategoryModalState.hide() }
+                        .invokeOnCompletion { onEvent(HomeEvent.DismissCreateCategoryModal) }
                 }
             )
         }
@@ -245,16 +266,83 @@ private fun HomeScreen(
                     GroupCard(
                         title = it.name,
                         collapsed = it.collapsed,
-                        onToggleCollapse = { onEvent(HomeEvent.ToggleGroupCollapsed(it.id)) }
+                        onToggleCollapse = { onEvent(HomeEvent.ToggleGroupCollapsed(it.id)) },
+                        onAdd = { onEvent(HomeEvent.ShowCreateCategoryModal(it.id)) }
                     ) {
-                        Text(
-                            "No categories in this group.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        )
+                        if (it.categories == null || it.categories.isEmpty()) {
+                            Text(
+                                "No categories in this group.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            )
+                        } else {
+                            for (category in it.categories) {
+                                Column(
+                                    modifier = Modifier
+                                        .clickable {}
+                                        .fillMaxWidth()
+                                        .background(
+                                            MaterialTheme.colorScheme.surfaceContainer,
+                                            MaterialTheme.shapes.small
+                                        )
+                                        .padding(16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.Top,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        val totalStyle =
+                                            MaterialTheme.typography.labelSmall.toSpanStyle()
+                                                .copy(color = Color.Gray)
+                                        val currentBalanceStyle =
+                                            MaterialTheme.typography.titleMedium.toSpanStyle()
+                                                .copy(color = MaterialTheme.colorScheme.primary)
+                                        val balance by remember(category.target) {
+                                            derivedStateOf {
+                                                buildAnnotatedString {
+                                                    withStyle(currentBalanceStyle) {
+                                                        append("$")
+                                                        append(category.target?.pretty)
+                                                    }
+                                                    withStyle(style = totalStyle) {
+                                                        append(
+                                                            " / $${category.target?.pretty}"
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        Text(
+                                            category.name,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            modifier = Modifier.weight(1f),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        Text(
+                                            text = balance,
+                                            style = MaterialTheme.typography.titleMedium
+                                        )
+                                    }
+
+                                    LinearProgressIndicator(
+                                        progress = { 1f },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        drawStopIndicator = {}
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -8,12 +8,17 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
 import com.elfennani.ledgerly.data.local.entities.GroupEntity
+import com.elfennani.ledgerly.data.local.relations.GroupWithCategories
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GroupDao {
     @Query("SELECT * FROM `groups`")
     fun getAllGroupsFlow(): Flow<List<GroupEntity>>
+
+    @Transaction
+    @Query("SELECT * FROM `groups`")
+    fun getAllGroupsWithCategoriesFlow(): Flow<List<GroupWithCategories>>
 
     @Query("SELECT * FROM `groups` WHERE id = :id")
     fun getGroupByIdFlow(id: Int): Flow<GroupEntity?>
@@ -72,5 +77,14 @@ interface GroupDao {
         updateGroupIndex(group?.id!!, toIndex)
         // Finally, set the moved group's index to the new position
 
+    }
+
+    @Query("DELETE FROM categories WHERE groupId = :groupId")
+    suspend fun deleteCategoriesByGroupId(groupId: Int)
+
+    @Transaction
+    suspend fun deleteGroupAndCategories(groupId: Int) {
+        deleteCategoriesByGroupId(groupId)
+        deleteGroupById(groupId)
     }
 }
