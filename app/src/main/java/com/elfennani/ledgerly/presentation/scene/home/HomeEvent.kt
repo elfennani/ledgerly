@@ -20,7 +20,6 @@ sealed class HomeEvent {
     data object SubmitCreateAccount : HomeEvent()
     data object SubmitEditAccount : HomeEvent()
     data class OnCategoryNameChange(val name: TextFieldValue) : HomeEvent()
-    data class OnCategoryTargetChange(val target: TextFieldValue) : HomeEvent()
     data object SubmitCreateCategory : HomeEvent()
 
 

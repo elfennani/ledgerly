@@ -4,5 +4,5 @@ data class Category(
     val id: Int = 0,
     val groupId: Int,
     val name: String,
-    val target: Double? = null,
+    val budgets: List<CategoryBudget> = emptyList()
 )

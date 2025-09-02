@@ -4,7 +4,10 @@ import com.elfennani.ledgerly.data.local.dao.CategoryDao
 import com.elfennani.ledgerly.data.mappers.toDomain
 import com.elfennani.ledgerly.data.mappers.toEntity
 import com.elfennani.ledgerly.domain.model.Category
+import com.elfennani.ledgerly.domain.model.CategoryBudget
 import com.elfennani.ledgerly.domain.repository.CategoryRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class CategoryRepositoryImpl @Inject constructor(
@@ -21,4 +24,9 @@ class CategoryRepositoryImpl @Inject constructor(
 
     override suspend fun deleteCategoryById(categoryId: Int) =
         categoryDao.deleteCategoryById(categoryId)
+
+    override fun getCategoryBudgetsFlow(): Flow<List<CategoryBudget>> {
+        return categoryDao.getAllCategoryBudgets()
+            .map { it.map { categoryBudgetEntity -> categoryBudgetEntity.toDomain() } }
+    }
 }

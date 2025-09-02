@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import com.elfennani.ledgerly.data.local.entities.CategoryBudgetEntity
 import com.elfennani.ledgerly.data.local.entities.CategoryEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CategoryDao {
@@ -19,4 +21,10 @@ interface CategoryDao {
 
     @Query("DELETE FROM categories WHERE id = :categoryId")
     suspend fun deleteCategoryById(categoryId: Int)
+
+    @Query("SELECT * FROM category_budgets")
+    fun getAllCategoryBudgets(): Flow<List<CategoryBudgetEntity>>
+
+    @Upsert
+    suspend fun upsertCategoryBudget(categoryBudget: CategoryBudgetEntity): Long
 }

@@ -8,5 +8,4 @@ data class CategoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val groupId: Int,
     val name: String,
-    val target: Double? = null,
 )

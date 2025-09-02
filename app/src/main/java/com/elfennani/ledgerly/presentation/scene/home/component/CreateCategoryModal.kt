@@ -12,7 +12,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -25,14 +24,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Group
 import com.elfennani.ledgerly.presentation.scene.home.HomeEvent
 import com.elfennani.ledgerly.presentation.scene.home.model.CategoryFormState
@@ -48,7 +43,6 @@ fun CreateCategoryModal(
     onDismissRequest: () -> Unit = {},
 ) {
     val nameFocusRequester = remember { FocusRequester() }
-    val targetFocusRequester = remember { FocusRequester() }
     val group = groups.firstOrNull { it.id == formState.groupId }
 
     LaunchedEffect(Unit) {
@@ -101,32 +95,6 @@ fun CreateCategoryModal(
                 keyboardOptions = KeyboardOptions.Default.copy(
                     capitalization = KeyboardCapitalization.Words
                 ),
-            )
-
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(targetFocusRequester),
-                value = formState.target,
-                onValueChange = {
-                    onEvent(HomeEvent.OnCategoryTargetChange(it))
-                },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Next
-                ),
-                trailingIcon = {
-                    Icon(painterResource(R.drawable.currency_dollar), null)
-                },
-                label = { Text("Target") },
-                placeholder = { Text("0.00") },
-                shape = MaterialTheme.shapes.small,
-                singleLine = true,
-                isError = !formState.targetError.isNullOrEmpty(),
-                supportingText = {
-                    if (!formState.targetError.isNullOrEmpty())
-                        Text(formState.targetError)
-                }
             )
 
             Button(

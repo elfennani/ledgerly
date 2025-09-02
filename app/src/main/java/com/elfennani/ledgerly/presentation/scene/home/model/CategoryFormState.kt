@@ -5,12 +5,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 data class CategoryFormState(
     // Fields
     val name: TextFieldValue = TextFieldValue(""),
-    val target: TextFieldValue = TextFieldValue(""),
     val groupId: Int? = null,
 
     // Error
     val nameError: String? = null,
-    val targetError: String? = null,
     val groupError: String? = null,
 
     // Status

@@ -272,14 +272,6 @@ class HomeViewModel @Inject constructor(
                 }
             }
 
-            is HomeEvent.OnCategoryTargetChange -> {
-                _state.update {
-                    it.copy(
-                        categoryFormState = it.categoryFormState.copy(target = event.target)
-                    )
-                }
-            }
-
             is HomeEvent.ShowCreateCategoryModal -> {
                 _state.update {
                     it.copy(
@@ -306,26 +298,6 @@ class HomeViewModel @Inject constructor(
                             return@launch
                         }
 
-                        if (current.target.text.toDoubleOrNull() == null) {
-                            _state.update {
-                                it.copy(
-                                    categoryFormState = it.categoryFormState.copy(
-                                        targetError = "Invalid target amount"
-                                    )
-                                )
-                            }
-                            return@launch
-                        } else if (current.target.text.toDouble() < 0) {
-                            _state.update {
-                                it.copy(
-                                    categoryFormState = it.categoryFormState.copy(
-                                        targetError = "Target cannot be negative"
-                                    )
-                                )
-                            }
-                            return@launch
-                        }
-
                         _state.update {
                             it.copy(
                                 categoryFormState = it.categoryFormState.copy(
@@ -335,7 +307,6 @@ class HomeViewModel @Inject constructor(
                         }
                         createCategory(
                             name = current.name.text,
-                            target = current.target.text.toDouble(),
                             groupId = groupId
                         )
                         _state.update {

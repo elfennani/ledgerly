@@ -1,14 +1,16 @@
 package com.elfennani.ledgerly.data.mappers
 
+import com.elfennani.ledgerly.data.local.entities.CategoryBudgetEntity
 import com.elfennani.ledgerly.data.local.entities.CategoryEntity
 import com.elfennani.ledgerly.domain.model.Category
+import com.elfennani.ledgerly.domain.model.CategoryBudget
 
-fun CategoryEntity.toDomain(): Category {
+fun CategoryEntity.toDomain(budgets: List<CategoryBudget> = emptyList()): Category {
     return Category(
         id = this.id,
         groupId = this.groupId,
         name = this.name,
-        target = this.target
+        budgets = budgets
     )
 }
 
@@ -17,6 +19,15 @@ fun Category.toEntity(): CategoryEntity {
         id = this.id,
         groupId = this.groupId,
         name = this.name,
-        target = this.target
+    )
+}
+
+fun CategoryBudgetEntity.toDomain(): CategoryBudget {
+    return CategoryBudget(
+        categoryId = this.categoryId,
+        month = this.month,
+        year = this.year,
+        target = this.target,
+        budget = this.budget
     )
 }
