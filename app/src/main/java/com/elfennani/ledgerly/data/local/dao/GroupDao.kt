@@ -45,16 +45,21 @@ interface GroupDao {
     @Query("UPDATE `groups` SET `index` = `index` - 1 WHERE `index` BETWEEN :startIndex AND :endIndex")
     suspend fun decrementIndicesInRange(startIndex: Int, endIndex: Int)
 
-    @Query("UPDATE `groups` SET `index` = :newIndex WHERE `index` = :currentIndex")
-    suspend fun updateGroupIndex(currentIndex: Int, newIndex: Int)
+    @Query("UPDATE `groups` SET `index` = :newIndex WHERE `id` = :id")
+    suspend fun updateGroupIndex(id: Int, newIndex: Int)
 
     // toggle collapsed state
     @Query("UPDATE `groups` SET `collapsed` = NOT `collapsed` WHERE id = :groupId")
     suspend fun toggleGroupCollapsed(groupId: Int)
 
+    @Query("SELECT * FROM `groups` WHERE `index`=:index")
+    suspend fun getGroupByIndex(index: Int): GroupEntity?
+
     @Transaction
     suspend fun moveGroup(fromIndex: Int, toIndex: Int) {
         if (fromIndex == toIndex) return
+
+        val group = getGroupByIndex(fromIndex)
 
         if (fromIndex < toIndex) {
             // Moving down: decrement indices of groups between fromIndex and toIndex
@@ -64,7 +69,8 @@ interface GroupDao {
             incrementIndicesInRange(toIndex, fromIndex - 1)
         }
 
+        updateGroupIndex(group?.id!!, toIndex)
         // Finally, set the moved group's index to the new position
-        updateGroupIndex(fromIndex, toIndex)
+
     }
 }

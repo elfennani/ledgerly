@@ -14,4 +14,5 @@ sealed class GroupsEvent {
 
     // Group Actions
     data class DeleteGroup(val groupId: Int) : GroupsEvent()
+    data class MoveGroup(val fromIndex: Int, val toIndex: Int) : GroupsEvent()
 }

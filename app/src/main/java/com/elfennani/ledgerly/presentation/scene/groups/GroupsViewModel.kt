@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.elfennani.ledgerly.domain.usecase.CreateGroupUseCase
 import com.elfennani.ledgerly.domain.usecase.DeleteGroupUseCase
 import com.elfennani.ledgerly.domain.usecase.GetGroupsUseCase
+import com.elfennani.ledgerly.domain.usecase.MoveGroupUseCase
 import com.elfennani.ledgerly.domain.usecase.UpdateGroupUseCase
 import com.elfennani.ledgerly.presentation.scene.groups.model.GroupFormState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +20,8 @@ class GroupsViewModel @Inject constructor(
     getGroups: GetGroupsUseCase,
     private val updateGroupUseCase: UpdateGroupUseCase,
     private val deleteGroupUseCase: DeleteGroupUseCase,
-    private val createGroupUseCase: CreateGroupUseCase
+    private val createGroupUseCase: CreateGroupUseCase,
+    private val moveGroupUseCase: MoveGroupUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(GroupsUiState(isLoading = true))
@@ -151,6 +153,12 @@ class GroupsViewModel @Inject constructor(
             is GroupsEvent.DeleteGroup -> {
                 viewModelScope.launch {
                     deleteGroupUseCase(event.groupId)
+                }
+            }
+
+            is GroupsEvent.MoveGroup -> {
+                viewModelScope.launch {
+                    moveGroupUseCase(event.fromIndex, event.toIndex)
                 }
             }
         }
