@@ -2,6 +2,7 @@ package com.elfennani.ledgerly.data.mappers
 
 import com.elfennani.ledgerly.data.local.entities.CategoryBudgetEntity
 import com.elfennani.ledgerly.data.local.entities.CategoryEntity
+import com.elfennani.ledgerly.data.local.relations.CategoryWithBudgets
 import com.elfennani.ledgerly.domain.model.Category
 import com.elfennani.ledgerly.domain.model.CategoryBudget
 
@@ -30,4 +31,19 @@ fun CategoryBudgetEntity.toDomain(): CategoryBudget {
         target = this.target,
         budget = this.budget
     )
+}
+
+fun CategoryBudget.toEntity(lastUpdated: Long = System.currentTimeMillis()): CategoryBudgetEntity {
+    return CategoryBudgetEntity(
+        categoryId = this.categoryId,
+        month = this.month,
+        year = this.year,
+        target = this.target,
+        budget = this.budget,
+        lastUpdated = lastUpdated
+    )
+}
+
+fun CategoryWithBudgets.toDomain(): Category {
+    return category.toDomain(budgets.map { it.toDomain() })
 }

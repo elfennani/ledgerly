@@ -23,6 +23,8 @@ import androidx.navigation.compose.rememberNavController
 import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Tab
 import com.elfennani.ledgerly.presentation.component.AppScaffold
+import com.elfennani.ledgerly.presentation.scene.category.CategoryRoute
+import com.elfennani.ledgerly.presentation.scene.category.CategoryScreen
 import com.elfennani.ledgerly.presentation.scene.groups.GroupsRoute
 import com.elfennani.ledgerly.presentation.scene.groups.GroupsScreen
 import com.elfennani.ledgerly.presentation.scene.home.HomeRoute
@@ -140,6 +142,11 @@ fun Navigation() {
             }
             composable<GroupsRoute> {
                 GroupsScreen(
+                    navController = navController
+                )
+            }
+            composable<CategoryRoute> {
+                CategoryScreen(
                     navController = navController
                 )
             }

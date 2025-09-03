@@ -61,6 +61,7 @@ fun GroupCard(
     group: Group,
     onToggleCollapse: () -> Unit = {},
     onAdd: () -> Unit = {},
+    onPressCategory: (Category) -> Unit = {},
 ) {
     val rotation by animateFloatAsState(targetValue = if (group.collapsed) 180f else 0f)
     val now = java.time.LocalDate.now()
@@ -159,7 +160,7 @@ fun GroupCard(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { }
+                                .clickable { onPressCategory(category) }
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                                 .padding(horizontal = 12.dp)
                                 .padding(end = 4.dp)

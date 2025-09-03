@@ -52,6 +52,7 @@ import com.elfennani.ledgerly.domain.model.Account
 import com.elfennani.ledgerly.domain.model.Group
 import com.elfennani.ledgerly.presentation.component.AccountCard
 import com.elfennani.ledgerly.presentation.component.GroupCard
+import com.elfennani.ledgerly.presentation.scene.category.CategoryRoute
 import com.elfennani.ledgerly.presentation.scene.groups.GroupsRoute
 import com.elfennani.ledgerly.presentation.scene.home.component.AccountDetailsModal
 import com.elfennani.ledgerly.presentation.scene.home.component.CreateAccountModal
@@ -72,7 +73,8 @@ fun HomeScreen(
     HomeScreen(
         state = state,
         onEvent = viewModel::onEvent,
-        onNavigateToGroups = { navController.navigate(GroupsRoute) }
+        onNavigateToGroups = { navController.navigate(GroupsRoute) },
+        onNavigateToCategory = { categoryId -> navController.navigate(CategoryRoute(categoryId)) }
     )
 }
 
@@ -82,6 +84,7 @@ private fun HomeScreen(
     state: HomeUiState,
     onEvent: (HomeEvent) -> Unit = {},
     onNavigateToGroups: () -> Unit = {},
+    onNavigateToCategory: (Int) -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -294,6 +297,9 @@ private fun HomeScreen(
                         },
                         onToggleCollapse = {
                             onEvent(HomeEvent.ToggleGroupCollapsed(it.id))
+                        },
+                        onPressCategory = { category ->
+                            onNavigateToCategory(category.id)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
