@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,15 +31,20 @@ class HomeViewModel @Inject constructor(
     private val _state = MutableStateFlow(HomeUiState(isLoading = true))
     val state = _state.asStateFlow()
 
+    val now: Calendar = Calendar.getInstance()
+    val month = now.get(Calendar.MONTH)
+    val year = now.get(Calendar.YEAR)
+
     init {
         viewModelScope.launch {
-            getHomeOverview().collect {
+            getHomeOverview(month, year).collect {
                 Log.d("HomeViewModel", "Received home overview: $it")
                 _state.update { currentState ->
                     currentState.copy(
                         isLoading = false,
                         accounts = it.accounts,
-                        groups = it.groups
+                        groups = it.groups,
+                        budgetData = it.budgetData,
                     )
                 }
             }

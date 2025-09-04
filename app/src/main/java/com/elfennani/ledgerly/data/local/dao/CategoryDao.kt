@@ -12,6 +12,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CategoryDao {
+    @Query("SELECT * FROM categories")
+    @Transaction
+    fun getAllCategoriesFlow(): Flow<List<CategoryWithBudgets>>
+
     @Query("SELECT * FROM categories WHERE groupId = :groupId")
     suspend fun getCategoriesByGroupId(groupId: Int): List<CategoryEntity>
 

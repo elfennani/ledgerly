@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,12 +44,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Account
+import com.elfennani.ledgerly.domain.model.BudgetData
 import com.elfennani.ledgerly.domain.model.Group
 import com.elfennani.ledgerly.presentation.component.AccountCard
 import com.elfennani.ledgerly.presentation.component.GroupCard
@@ -60,7 +65,9 @@ import com.elfennani.ledgerly.presentation.scene.home.component.CreateCategoryMo
 import com.elfennani.ledgerly.presentation.scene.home.component.DeleteAccountDialog
 import com.elfennani.ledgerly.presentation.scene.home.component.EditAccountModal
 import com.elfennani.ledgerly.presentation.theme.AppTheme
+import com.elfennani.ledgerly.presentation.utils.pretty
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 private const val TAG = "HomeScreen"
 
@@ -269,7 +276,7 @@ private fun HomeScreen(
                             .padding(horizontal = 16.dp)
                     ) {
                         Text(
-                            "Groups",
+                            "Categories",
                             style = MaterialTheme.typography.labelLarge
                         )
 
@@ -285,6 +292,54 @@ private fun HomeScreen(
                             )
                             Spacer(Modifier.width(6.dp))
                             Text("Manage")
+                        }
+                    }
+                }
+
+                if (state.budgetData.unused != 0.0) {
+                    val percentage =
+                        (state.budgetData.total - state.budgetData.unused) / state.budgetData.total
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(bottom = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    progress = { percentage.toFloat() },
+                                    trackColor = MaterialTheme.colorScheme.primaryContainer,
+                                    modifier = Modifier.size(56.dp),
+                                )
+                                Text(
+                                    "${(percentage * 100).roundToInt()}%",
+                                    fontSize = 12.sp,
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.W600
+                                )
+                            }
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(0.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "Ready to Assign",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+
+                                Text(
+                                    text = "$${state.budgetData.unused.pretty} Left to Budget",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }
                 }
@@ -324,6 +379,11 @@ private fun HomeScreenPreview() {
                 ),
                 groups = listOf(
                     Group(id = 1, name = "Bills", index = 0)
+                ),
+                budgetData = BudgetData(
+                    used = 157.00,
+                    unused = 843.00,
+                    total = 1000.00
                 )
             )
         )

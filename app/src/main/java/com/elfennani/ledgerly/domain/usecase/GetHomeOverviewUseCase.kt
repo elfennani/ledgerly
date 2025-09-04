@@ -9,16 +9,19 @@ import javax.inject.Inject
 class GetHomeOverviewUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
     private val getGroupsUseCase: GetGroupsUseCase,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val getBudgetDataUseCase: GetBudgetDataUseCase
 ) {
-    operator fun invoke() =
+    operator fun invoke(monthIndex: Int, year: Int) =
         combine(
             accountRepository.accountListFlow,
             getGroupsUseCase(),
-            categoryRepository.getCategoryBudgetsFlow()
-        ) { accounts, groups, budgets ->
+            categoryRepository.getCategoryBudgetsFlow(),
+            getBudgetDataUseCase(monthIndex, year)
+        ) { accounts, groups, budgets, budgetData ->
             HomeOverview(
                 accounts = accounts,
+                budgetData = budgetData,
                 groups = groups.sortedBy { it.index }.map { group ->
                     group.copy(
                         categories = group.categories?.map { category ->

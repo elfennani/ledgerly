@@ -13,6 +13,10 @@ import javax.inject.Inject
 class CategoryRepositoryImpl @Inject constructor(
     private val categoryDao: CategoryDao
 ) : CategoryRepository {
+    override fun getCategoriesFlow(): Flow<List<Category>> {
+        return categoryDao.getAllCategoriesFlow().map { it.map { entity -> entity.toDomain() } }
+    }
+
     override fun getCategoryByIdFlow(categoryId: Int): Flow<Category?> {
         return categoryDao.getCategoryByIdFlow(categoryId).map { it?.toDomain() }
     }

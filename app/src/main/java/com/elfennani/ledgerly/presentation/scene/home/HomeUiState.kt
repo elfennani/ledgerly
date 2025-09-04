@@ -1,6 +1,7 @@
 package com.elfennani.ledgerly.presentation.scene.home
 
 import com.elfennani.ledgerly.domain.model.Account
+import com.elfennani.ledgerly.domain.model.BudgetData
 import com.elfennani.ledgerly.domain.model.Group
 import com.elfennani.ledgerly.presentation.scene.home.model.AccountFormState
 import com.elfennani.ledgerly.presentation.scene.home.model.CategoryFormState
@@ -15,5 +16,6 @@ data class HomeUiState(
     val isCreateAccountModalVisible: Boolean = false,
     val createCategoryGroupId: Int? = null,
     val accountFormState: AccountFormState = AccountFormState(),
-    val categoryFormState: CategoryFormState = CategoryFormState()
+    val categoryFormState: CategoryFormState = CategoryFormState(),
+    val budgetData: BudgetData = BudgetData()
 )

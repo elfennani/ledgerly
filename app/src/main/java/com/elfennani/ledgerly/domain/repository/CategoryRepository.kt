@@ -5,6 +5,7 @@ import com.elfennani.ledgerly.domain.model.CategoryBudget
 import kotlinx.coroutines.flow.Flow
 
 interface CategoryRepository {
+    fun getCategoriesFlow(): Flow<List<Category>>
     fun getCategoryByIdFlow(categoryId: Int): Flow<Category?>
     suspend fun getCategoriesByGroupId(groupId: Int): List<Category>
     suspend fun upsertCategory(category: Category): Long
