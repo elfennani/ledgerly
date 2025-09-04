@@ -1,5 +1,6 @@
 package com.elfennani.ledgerly.presentation.scene.category
 
+import com.elfennani.ledgerly.domain.model.BudgetData
 import com.elfennani.ledgerly.domain.model.Category
 import com.elfennani.ledgerly.domain.model.Group
 import com.elfennani.ledgerly.presentation.scene.category.model.CategoryValueType
@@ -10,6 +11,7 @@ data class CategoryUiState(
     val isLoading: Boolean = false,
     val category: Category? = null,
     val group: Group? = null,
+    val budgetData: BudgetData = BudgetData(),
 
     val valueEditForm: EditValueForm = EditValueForm(),
     val valueEditModalType: CategoryValueType? = null,
@@ -18,4 +20,5 @@ data class CategoryUiState(
     val isNameEditModalVisible: Boolean = false,
 
     val isDeleteConfirmationVisible: Boolean = false,
+    val isDeleteSuccess: Boolean = false,
 )

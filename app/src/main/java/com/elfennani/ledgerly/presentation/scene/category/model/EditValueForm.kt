@@ -3,6 +3,7 @@ package com.elfennani.ledgerly.presentation.scene.category.model
 import androidx.compose.ui.text.input.TextFieldValue
 
 data class EditValueForm(
+    val initialValue: Double = 0.0,
     val value: TextFieldValue = TextFieldValue(""),
     val monthIndex: Int = 0,
     val year: Int = 0,

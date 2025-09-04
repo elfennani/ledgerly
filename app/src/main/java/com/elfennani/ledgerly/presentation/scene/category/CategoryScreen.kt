@@ -1,5 +1,6 @@
 package com.elfennani.ledgerly.presentation.scene.category
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -49,11 +51,13 @@ import com.elfennani.ledgerly.domain.model.Category
 import com.elfennani.ledgerly.domain.model.CategoryBudget
 import com.elfennani.ledgerly.domain.model.Group
 import com.elfennani.ledgerly.presentation.component.ActionCard
-import com.elfennani.ledgerly.presentation.component.startsWithEmoji
+import com.elfennani.ledgerly.presentation.scene.category.component.DeleteCategoryDialog
 import com.elfennani.ledgerly.presentation.scene.category.component.EditCategoryModal
 import com.elfennani.ledgerly.presentation.scene.category.component.EditValueModal
 import com.elfennani.ledgerly.presentation.scene.category.model.CategoryValueType
 import com.elfennani.ledgerly.presentation.theme.AppTheme
+import com.elfennani.ledgerly.presentation.utils.excludeFirstEmoji
+import com.elfennani.ledgerly.presentation.utils.firstEmojiOrNull
 import com.elfennani.ledgerly.presentation.utils.pretty
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -83,6 +87,13 @@ private fun CategoryScreen(
     val scope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    LaunchedEffect(state.isDeleteSuccess) {
+        Log.d("CategoryScreen", "isDeleteSuccess: ${state.isDeleteSuccess}")
+        if (state.isDeleteSuccess) {
+            onBack()
+        }
+    }
+
     if (state.isNameEditModalVisible) {
         EditCategoryModal(
             formState = state.nameEditForm,
@@ -106,6 +117,7 @@ private fun CategoryScreen(
             formState = state.valueEditForm,
             sheetState = valueEditSheet,
             onEvent = onEvent,
+            budgetData = state.budgetData,
             onDismissRequest = {
                 scope.launch {
                     keyboardController?.hide()
@@ -119,6 +131,12 @@ private fun CategoryScreen(
         )
     }
 
+    if (state.isDeleteConfirmationVisible) {
+        DeleteCategoryDialog(state.category!!) {
+            onEvent(it)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -128,6 +146,15 @@ private fun CategoryScreen(
                         Icon(painterResource(R.drawable.arrow_left), null)
                     }
                 },
+                actions = {
+                    IconButton(onClick = { onEvent(CategoryEvent.DeleteCategory) }) {
+                        Icon(
+                            painterResource(R.drawable.trash),
+                            null,
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             )
         }
     ) { innerPadding ->
@@ -141,7 +168,7 @@ private fun CategoryScreen(
         }
         val primary = MaterialTheme.colorScheme.tertiary
 
-        if (state.isLoading) {
+        if (state.isLoading || state.category == null) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -175,8 +202,7 @@ private fun CategoryScreen(
                             .zIndex(1f),
                         contentAlignment = Alignment.Center
                     ) {
-                        val icon = state.category!!.name.substring(0, 2)
-                            .takeIf { state.category.name.startsWithEmoji() }
+                        val icon = state.category.name.firstEmojiOrNull()
 
                         if (icon != null) {
                             Text(
@@ -204,9 +230,7 @@ private fun CategoryScreen(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(
-                            text = state.category!!.name.let {
-                                if (it.startsWithEmoji()) it.drop(2).trim() else it
-                            },
+                            text = state.category.name.excludeFirstEmoji(),
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier,
                             lineHeight = 28.sp

@@ -32,6 +32,15 @@ interface CategoryDao {
     @Query("DELETE FROM categories WHERE id = :categoryId")
     suspend fun deleteCategoryById(categoryId: Int)
 
+    @Query("DELETE FROM category_budgets WHERE categoryId = :categoryId")
+    suspend fun deleteCategoryBudgetsByCategoryId(categoryId: Int)
+
+    @Transaction
+    suspend fun deleteCategoryAndItsBudgets(categoryId: Int) {
+        deleteCategoryBudgetsByCategoryId(categoryId)
+        deleteCategoryById(categoryId)
+    }
+
     @Query("SELECT * FROM category_budgets")
     fun getAllCategoryBudgets(): Flow<List<CategoryBudgetEntity>>
 

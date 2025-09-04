@@ -7,6 +7,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.elfennani.ledgerly.domain.usecase.DeleteCategoryUseCase
+import com.elfennani.ledgerly.domain.usecase.GetBudgetDataUseCase
 import com.elfennani.ledgerly.domain.usecase.GetCategoryUseCase
 import com.elfennani.ledgerly.domain.usecase.SetCategoryBudgetUseCase
 import com.elfennani.ledgerly.domain.usecase.SetCategoryTargetUseCase
@@ -18,8 +20,10 @@ import com.elfennani.ledgerly.presentation.utils.pretty
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +32,8 @@ class CategoryViewModel @Inject constructor(
     private val setCategoryBudget: SetCategoryBudgetUseCase,
     private val setCategoryTarget: SetCategoryTargetUseCase,
     private val updateCategoryName: UpdateCategoryNameUseCase,
+    private val deleteCategory: DeleteCategoryUseCase,
+    private val getBudgetData: GetBudgetDataUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -36,15 +42,26 @@ class CategoryViewModel @Inject constructor(
     private val _state = MutableStateFlow(CategoryUiState(isLoading = true))
     val state = _state.asStateFlow()
 
+    val now: Calendar = Calendar.getInstance()
+    val month = now.get(Calendar.MONTH)
+    val year = now.get(Calendar.YEAR)
+
     init {
         viewModelScope.launch {
-            getCategory(route.categoryId).collect { groupCategory ->
-                _state.value = CategoryUiState(
-                    isLoading = false,
-                    category = groupCategory?.second,
-                    group = groupCategory?.first
-                )
-            }
+            combine(
+                getCategory(route.categoryId),
+                getBudgetData(month, year)
+            ) { groupCategory, budgetData ->
+                if (groupCategory != null)
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            category = groupCategory.second,
+                            group = groupCategory.first,
+                            budgetData = budgetData
+                        )
+                    }
+            }.collect {}
         }
     }
 
@@ -58,6 +75,13 @@ class CategoryViewModel @Inject constructor(
                             monthIndex = event.monthIndex,
                             year = event.year,
                             valueType = event.valueType,
+                            initialValue = state.category?.budgets?.find { it.month == event.monthIndex && it.year == event.year }
+                                ?.let {
+                                    when (event.valueType) {
+                                        CategoryValueType.BUDGET -> it.budget
+                                        CategoryValueType.TARGET -> it.target
+                                    }
+                                } ?: 0.0,
                             value = state.category?.budgets?.find { it.month == event.monthIndex && it.year == event.year }
                                 ?.let {
                                     when (event.valueType) {
@@ -143,7 +167,32 @@ class CategoryViewModel @Inject constructor(
             }
 
             is CategoryEvent.ConfirmDeleteCategory -> {
-                TODO()
+                viewModelScope.launch {
+                    _state.value.category?.let {
+                        _state.update { state ->
+                            state.copy(
+                                isDeleteConfirmationVisible = false,
+                                isLoading = true
+                            )
+                        }
+                        Log.d("CategoryViewModel", "Deleting category: ${it.id}")
+                        deleteCategory(it.id)
+                        Log.d("CategoryViewModel", "Deleted category: ${it.id}")
+                        _state.update { state ->
+                            state.copy(
+                                isDeleteSuccess = true
+                            )
+                        }
+                    }
+                }
+            }
+
+            is CategoryEvent.DismissDeleteCategoryDialog -> {
+                _state.update {
+                    it.copy(
+                        isDeleteConfirmationVisible = false
+                    )
+                }
             }
 
             CategoryEvent.SubmitNameChange -> {

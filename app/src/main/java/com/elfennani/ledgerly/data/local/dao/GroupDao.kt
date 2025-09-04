@@ -44,6 +44,20 @@ interface GroupDao {
     @Query("DELETE FROM `groups` WHERE id = :id")
     suspend fun deleteGroupById(id: Int)
 
+
+    @Query("DELETE FROM category_budgets WHERE categoryId IN (SELECT id FROM categories WHERE groupId = :groupId)")
+    suspend fun deleteCategoryBudgetsByGroupId(groupId: Int)
+
+    @Transaction
+    suspend fun deleteGroupAndAdjustIndices(id: Int) {
+        val group = getGroupById(id) ?: return
+        deleteGroupById(id)
+        val groups = getAllGroups()
+        decrementIndicesInRange(group.index + 1, groups.size)
+        deleteCategoryBudgetsByGroupId(id)
+        deleteCategoriesByGroupId(id)
+    }
+
     @Query("UPDATE `groups` SET `index` = `index` + 1 WHERE `index` BETWEEN :startIndex AND :endIndex")
     suspend fun incrementIndicesInRange(startIndex: Int, endIndex: Int)
 
@@ -81,10 +95,4 @@ interface GroupDao {
 
     @Query("DELETE FROM categories WHERE groupId = :groupId")
     suspend fun deleteCategoriesByGroupId(groupId: Int)
-
-    @Transaction
-    suspend fun deleteGroupAndCategories(groupId: Int) {
-        deleteCategoriesByGroupId(groupId)
-        deleteGroupById(groupId)
-    }
 }

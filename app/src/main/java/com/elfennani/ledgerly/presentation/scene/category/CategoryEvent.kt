@@ -18,6 +18,7 @@ sealed class CategoryEvent {
 
     data object DeleteCategory : CategoryEvent()
     data object ConfirmDeleteCategory : CategoryEvent()
+    data object DismissDeleteCategoryDialog : CategoryEvent()
     data object SubmitValueChange : CategoryEvent()
     data object SubmitNameChange : CategoryEvent()
 }

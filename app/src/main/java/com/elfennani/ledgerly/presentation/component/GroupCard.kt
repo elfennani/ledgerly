@@ -45,14 +45,10 @@ import com.elfennani.ledgerly.domain.model.Category
 import com.elfennani.ledgerly.domain.model.CategoryBudget
 import com.elfennani.ledgerly.domain.model.Group
 import com.elfennani.ledgerly.presentation.theme.AppTheme
+import com.elfennani.ledgerly.presentation.utils.excludeFirstEmoji
+import com.elfennani.ledgerly.presentation.utils.firstEmojiOrNull
 import com.elfennani.ledgerly.presentation.utils.pretty
 
-fun String.startsWithEmoji(): Boolean {
-    if (isEmpty()) return false
-    val codePoint = this.codePointAt(0)
-    val type = Character.getType(codePoint)
-    return type == Character.OTHER_SYMBOL.toInt()
-}
 
 @SuppressLint("NewApi")
 @Composable
@@ -96,7 +92,7 @@ fun GroupCard(
                         .padding(8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    val icon = group.name.substring(0, 2).takeIf { group.name.startsWithEmoji() }
+                    val icon = group.name.firstEmojiOrNull()
 
                     if (icon != null) {
                         Text(
@@ -120,13 +116,7 @@ fun GroupCard(
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(
-                        text = group.name.let {
-                            if (it.startsWithEmoji()) {
-                                it.drop(2).trim()
-                            } else {
-                                it
-                            }
-                        },
+                        text = group.name.excludeFirstEmoji(),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
@@ -178,8 +168,7 @@ fun GroupCard(
                                     .padding(8.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                val icon = category.name.substring(0, 2)
-                                    .takeIf { category.name.startsWithEmoji() }
+                                val icon = category.name.firstEmojiOrNull()
 
                                 if (icon != null) {
                                     Text(
@@ -211,13 +200,7 @@ fun GroupCard(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = category.name.let {
-                                            if (it.startsWithEmoji()) {
-                                                it.drop(2).trim()
-                                            } else {
-                                                it
-                                            }
-                                        },
+                                        text = category.name.excludeFirstEmoji(),
                                         style = MaterialTheme.typography.titleMedium,
                                         modifier = Modifier.weight(1f)
                                     )

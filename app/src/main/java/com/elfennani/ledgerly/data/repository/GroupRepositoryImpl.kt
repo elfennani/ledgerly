@@ -30,8 +30,7 @@ class GroupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteGroup(group: Group) {
-        groupDao.deleteGroup(group.toEntity())
-        groupDao.decrementIndicesInRange(group.index + 1, groupDao.getAllGroups().size)
+        groupDao.deleteGroupAndAdjustIndices(group.id)
     }
 
     override suspend fun deleteGroupById(id: Int) {

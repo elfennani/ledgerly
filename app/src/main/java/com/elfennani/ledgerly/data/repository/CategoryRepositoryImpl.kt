@@ -28,10 +28,10 @@ class CategoryRepositoryImpl @Inject constructor(
         categoryDao.upsertCategory(category.toEntity())
 
     override suspend fun deleteCategory(category: Category) =
-        categoryDao.deleteCategory(category.toEntity())
+        categoryDao.deleteCategoryAndItsBudgets(category.id)
 
     override suspend fun deleteCategoryById(categoryId: Int) =
-        categoryDao.deleteCategoryById(categoryId)
+        categoryDao.deleteCategoryAndItsBudgets(categoryId)
 
     override fun getCategoryBudgetsFlow(): Flow<List<CategoryBudget>> {
         return categoryDao.getAllCategoryBudgets()
