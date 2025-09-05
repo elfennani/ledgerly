@@ -87,7 +87,7 @@ private fun ProductListScreen(
                     ) {
                         Text(product.name, style = MaterialTheme.typography.titleMedium)
                         Text(
-                            text = "${product.type.capitalize(Locale.getDefault())} • ${product.pricePerUnit.pretty} per ${product.defaultUnit ?: "unit"}",
+                            text = "${product.type.capitalize(Locale.getDefault())} • $${product.pricePerUnit.pretty} per ${product.defaultUnit ?: "unit"}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
