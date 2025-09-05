@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -29,6 +30,8 @@ import com.elfennani.ledgerly.presentation.scene.groups.GroupsRoute
 import com.elfennani.ledgerly.presentation.scene.groups.GroupsScreen
 import com.elfennani.ledgerly.presentation.scene.home.HomeRoute
 import com.elfennani.ledgerly.presentation.scene.home.HomeScreen
+import com.elfennani.ledgerly.presentation.scene.product_form.ProductFormRoute
+import com.elfennani.ledgerly.presentation.scene.product_form.ProductFormScreen
 import com.elfennani.ledgerly.presentation.scene.products.ProductListRoute
 import com.elfennani.ledgerly.presentation.scene.products.ProductListScreen
 import com.elfennani.ledgerly.presentation.scene.transactions.TransactionListRoute
@@ -85,7 +88,9 @@ fun Navigation() {
         NavHost(
             navController = navController,
             startDestination = HomeRoute,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier
+                .consumeWindowInsets(innerPadding)
+                .padding(innerPadding),
             enterTransition = {
                 fadeIn() + slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
@@ -147,6 +152,12 @@ fun Navigation() {
             }
             composable<CategoryRoute> {
                 CategoryScreen(
+                    navController = navController
+                )
+            }
+
+            composable<ProductFormRoute> {
+                ProductFormScreen(
                     navController = navController
                 )
             }

@@ -8,22 +8,27 @@ import androidx.room.migration.AutoMigrationSpec
 import com.elfennani.ledgerly.data.local.dao.AccountDao
 import com.elfennani.ledgerly.data.local.dao.CategoryDao
 import com.elfennani.ledgerly.data.local.dao.GroupDao
+import com.elfennani.ledgerly.data.local.dao.ProductDao
 import com.elfennani.ledgerly.data.local.entities.AccountEntity
 import com.elfennani.ledgerly.data.local.entities.CategoryBudgetEntity
 import com.elfennani.ledgerly.data.local.entities.CategoryEntity
 import com.elfennani.ledgerly.data.local.entities.GroupEntity
+import com.elfennani.ledgerly.data.local.entities.ProductEntity
 
 @Database(
     entities = [
         AccountEntity::class,
         GroupEntity::class,
         CategoryEntity::class,
-        CategoryBudgetEntity::class
+        CategoryBudgetEntity::class,
+        ProductEntity::class
     ],
-    version = 3,
+    version = 5,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
-        AutoMigration(from = 2, to = 3, spec = AppDatabase.DeletedTargetMigration::class)
+        AutoMigration(from = 2, to = 3, spec = AppDatabase.DeletedTargetMigration::class),
+        AutoMigration(from = 3, to = 4),
+        AutoMigration(from = 4, to = 5)
     ],
     exportSchema = true
 )
@@ -31,6 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun accountDao(): AccountDao
     abstract fun groupDao(): GroupDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun productDao(): ProductDao
 
     @DeleteColumn(tableName = "categories", columnName = "target")
     class DeletedTargetMigration : AutoMigrationSpec
