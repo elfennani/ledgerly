@@ -54,7 +54,9 @@ class ProductFormViewModel @Inject constructor(
                         description = currentState.description.text.takeIf {
                             it.isNotBlank()
                         },
-                        pricePerUnit = currentState.unitPrice.text.toDouble(),
+                        pricePerUnit = currentState.unitPrice.text.takeIf {
+                            it.isNotBlank()
+                        }?.toDoubleOrNull(),
                         defaultUnit = currentState.unit.text.takeIf {
                             it.isNotBlank()
                         },
@@ -96,6 +98,12 @@ class ProductFormViewModel @Inject constructor(
                     )
                 }
             }
+
+            ProductFormEvent.ToggleIsPriceFixed -> {
+                _state.update {
+                    it.copy(isPriceFixed = !it.isPriceFixed)
+                }
+            }
         }
     }
 
@@ -104,7 +112,6 @@ class ProductFormViewModel @Inject constructor(
             currentState.copy(
                 nameError = if (currentState.name.text.isBlank()) "Name cannot be empty" else null,
                 unitPriceError = when {
-                    currentState.unitPrice.text.isBlank() -> "Unit Price cannot be empty"
                     currentState.unitPrice.text.toDoubleOrNull() == null -> "Unit Price must be a valid number"
                     currentState.unitPrice.text.toDouble() < 0.0 -> "Unit Price cannot be negative"
                     else -> null

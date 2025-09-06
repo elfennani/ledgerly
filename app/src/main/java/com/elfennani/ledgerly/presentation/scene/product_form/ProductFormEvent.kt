@@ -8,6 +8,7 @@ sealed class ProductFormEvent {
     data class UnitPriceChanged(val unitPrice: TextFieldValue) : ProductFormEvent()
     data class UnitChanged(val unit: TextFieldValue) : ProductFormEvent()
     data class TypeChanged(val type: TextFieldValue) : ProductFormEvent()
+    data object ToggleIsPriceFixed : ProductFormEvent()
 
     object Submit : ProductFormEvent()
 }

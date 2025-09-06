@@ -87,7 +87,10 @@ private fun ProductListScreen(
                     ) {
                         Text(product.name, style = MaterialTheme.typography.titleMedium)
                         Text(
-                            text = "${product.type.capitalize(Locale.getDefault())} • $${product.pricePerUnit.pretty} per ${product.defaultUnit ?: "unit"}",
+                            text = when {
+                                product.pricePerUnit != null -> "${product.type.capitalize(Locale.getDefault())} • $${product.pricePerUnit.pretty} per ${product.defaultUnit ?: "unit"}"
+                                else -> product.type.capitalize(Locale.getDefault())
+                            },
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
@@ -125,7 +128,7 @@ private fun ProductListScreenPreview() {
                         id = 3,
                         name = "Shampoo",
                         description = "Hair care shampoo",
-                        pricePerUnit = 5.0,
+                        pricePerUnit = null,
                         defaultUnit = "bottle",
                         type = "personal care"
                     )

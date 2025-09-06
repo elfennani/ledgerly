@@ -1,5 +1,6 @@
 package com.elfennani.ledgerly.data.local.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,5 +11,6 @@ data class ProductEntity(
     val description: String? = null,
     val type: String,
     val defaultUnit: String?,
-    val pricePerUnit: Double = 0.0,
+    @ColumnInfo(defaultValue = "NULL")
+    val pricePerUnit: Double? = null,
 )

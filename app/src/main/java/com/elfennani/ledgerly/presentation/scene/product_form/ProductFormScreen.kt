@@ -1,5 +1,6 @@
 package com.elfennani.ledgerly.presentation.scene.product_form
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -21,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -173,65 +175,83 @@ private fun ProductFormScreen(
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.Top,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedTextField(
+                    Switch(
                         modifier = Modifier
-                            .weight(1f)
-                            .focusRequester(unitPriceFocus),
-                        value = state.unitPrice,
-                        onValueChange = {
-                            onEvent(ProductFormEvent.UnitPriceChanged(it))
-                        },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Decimal,
-                            imeAction = ImeAction.Next
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onNext = { unitFocus.requestFocus() }
-                        ),
-                        trailingIcon = {
-                            Icon(painterResource(R.drawable.currency_dollar), null)
-                        },
-                        label = { Text("Unit Price") },
-                        placeholder = { Text("0.00") },
-                        shape = MaterialTheme.shapes.small,
-                        singleLine = true,
-                        isError = !state.unitPriceError.isNullOrEmpty(),
-                        supportingText = {
-                            if (!state.unitPriceError.isNullOrEmpty())
-                                Text(state.unitPriceError)
+                            .focusRequester(typeFocus),
+                        checked = state.isPriceFixed,
+                        onCheckedChange = {
+                            onEvent(ProductFormEvent.ToggleIsPriceFixed)
                         }
                     )
 
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .weight(1f)
-                            .focusRequester(unitFocus),
-                        value = state.unit,
-                        onValueChange = {
-                            onEvent(ProductFormEvent.UnitChanged(it))
-                        },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Next
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onNext = { descriptionFocus.requestFocus() }
-                        ),
-                        label = { Text("Unit (optional)") },
-                        placeholder = { Text("item") },
-                        shape = MaterialTheme.shapes.small,
-                        singleLine = true,
-                        isError = !state.unitError.isNullOrEmpty(),
-                        supportingText = {
-                            if (!state.unitError.isNullOrEmpty())
-                                Text(state.unitError)
-                        }
-                    )
+                    Text("Is Price Fixed", style = MaterialTheme.typography.bodyLarge)
                 }
 
+                AnimatedVisibility(state.isPriceFixed) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.Top,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .weight(1f)
+                                .focusRequester(unitPriceFocus),
+                            value = state.unitPrice,
+                            onValueChange = {
+                                onEvent(ProductFormEvent.UnitPriceChanged(it))
+                            },
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                keyboardType = KeyboardType.Decimal,
+                                imeAction = ImeAction.Next
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onNext = { unitFocus.requestFocus() }
+                            ),
+                            trailingIcon = {
+                                Icon(painterResource(R.drawable.currency_dollar), null)
+                            },
+                            label = { Text("Unit Price") },
+                            placeholder = { Text("0.00") },
+                            shape = MaterialTheme.shapes.small,
+                            singleLine = true,
+                            isError = !state.unitPriceError.isNullOrEmpty(),
+                            supportingText = {
+                                if (!state.unitPriceError.isNullOrEmpty())
+                                    Text(state.unitPriceError)
+                            }
+                        )
+
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .weight(1f)
+                                .focusRequester(unitFocus),
+                            value = state.unit,
+                            onValueChange = {
+                                onEvent(ProductFormEvent.UnitChanged(it))
+                            },
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                imeAction = ImeAction.Next
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onNext = { descriptionFocus.requestFocus() }
+                            ),
+                            label = { Text("Unit (optional)") },
+                            placeholder = { Text("item") },
+                            shape = MaterialTheme.shapes.small,
+                            singleLine = true,
+                            isError = !state.unitError.isNullOrEmpty(),
+                            supportingText = {
+                                if (!state.unitError.isNullOrEmpty())
+                                    Text(state.unitError)
+                            }
+                        )
+                    }
+                }
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()

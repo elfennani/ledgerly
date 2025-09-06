@@ -10,7 +10,7 @@ class CreateProductUseCase @Inject constructor(private val productRepository: Pr
         description: String?,
         type: String,
         defaultUnit: String?,
-        pricePerUnit: Double
+        pricePerUnit: Double?
     ) {
         val product = Product(
             name = name,

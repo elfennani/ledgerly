@@ -11,6 +11,7 @@ data class ProductFormUiState(
     val unitPrice: TextFieldValue = TextFieldValue(""),
     val unit: TextFieldValue = TextFieldValue(""),
     val type: TextFieldValue = TextFieldValue(""),
+    val isPriceFixed: Boolean = true,
 
     val nameError: String? = null,
     val descriptionError: String? = null,
