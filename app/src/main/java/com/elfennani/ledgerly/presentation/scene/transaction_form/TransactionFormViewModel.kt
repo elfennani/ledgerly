@@ -1,0 +1,195 @@
+package com.elfennani.ledgerly.presentation.scene.transaction_form
+
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.elfennani.ledgerly.domain.usecase.GetProductsUseCase
+import com.elfennani.ledgerly.presentation.scene.transaction_form.model.SplitItem
+import com.elfennani.ledgerly.presentation.utils.pretty
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class TransactionFormViewModel @Inject constructor(
+    private val getProducts: GetProductsUseCase
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(TransactionFormUiState())
+    val state = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            getProducts().first().let {
+                _state.update { state -> state.copy(products = it) }
+            }
+        }
+    }
+
+    fun onEvent(event: TransactionFormEvent) {
+        when (event) {
+            is TransactionFormEvent.AddProduct -> _state.update { state ->
+                state.copy(
+                    splits = state.splits + SplitItem(
+                        id = if (state.splits.isEmpty()) 0 else state.splits.maxOf { it.id } + 1,
+                        product = event.product,
+                        isByUnit = event.product.pricePerUnit != null,
+                        units = 1,
+                        total = event.product.pricePerUnit ?: 0.00,
+                        isNew = true,
+                        totalText = TextFieldValue(
+                            text = event.product.pricePerUnit?.pretty ?: "",
+                            selection = TextRange(event.product.pricePerUnit?.pretty?.length ?: 0)
+                        )
+                    )
+                )
+            }
+
+            is TransactionFormEvent.ConfirmSplit -> _state.update { state ->
+                val split = state.splits.find { it.id == event.splitId }!!
+
+                if (split.totalText.text.toDoubleOrNull() == null) {
+                    return@update state.copy(
+                        error = "Invalid total value for \"${split.product.name}\""
+                    )
+                }
+
+                state.copy(
+                    openSplitId = null,
+                    splits = state.splits.map { split ->
+                        if (split.id == event.splitId) {
+                            split.copy(
+                                total = split.totalText.text.toDouble()
+                            )
+                        } else
+                            split
+                    }
+                )
+            }
+
+            is TransactionFormEvent.IncrementQuantity -> _state.update { state ->
+                state.copy(
+                    splits = state.splits.map { split ->
+                        if (split.id == event.splitId) {
+                            split.copy(
+                                units = split.units + 1,
+                                totalText = if (split.isByUnit && split.product.pricePerUnit != null) TextFieldValue(
+                                    text = (split.product.pricePerUnit * (split.units + 1)).pretty,
+                                    selection = TextRange(
+                                        (split.product.pricePerUnit * (split.units + 1)).pretty.length
+                                    )
+                                ) else split.totalText
+                            )
+                        } else
+                            split
+                    }
+                )
+            }
+
+            is TransactionFormEvent.DecrementQuantity -> _state.update { state ->
+                state.copy(
+                    splits = state.splits.map { split ->
+                        if (split.id == event.splitId) {
+                            split.copy(
+                                units = (split.units - 1).coerceAtLeast(1)
+                            )
+                        } else
+                            split
+                    }
+                )
+            }
+
+            is TransactionFormEvent.EditSplit -> _state.update { it.copy(openSplitId = event.splitId) }
+            is TransactionFormEvent.RemoveSplit -> _state.update {
+                it.copy(splits = it.splits.filterNot { split -> split.id == event.splitId })
+            }
+
+            is TransactionFormEvent.SetAccount -> _state.update { it.copy(account = event.account) }
+            is TransactionFormEvent.SetCategory -> _state.update { it.copy(category = event.category) }
+            is TransactionFormEvent.SetDate -> _state.update { it.copy(date = event.date) }
+            is TransactionFormEvent.SetIsByUnit -> _state.update { state ->
+                state.copy(
+                    splits = state.splits.map { split ->
+                        if (split.id == event.splitId) {
+                            split.copy(isByUnit = event.isByUnit)
+                        } else
+                            split
+                    }
+                )
+            }
+
+            is TransactionFormEvent.SetQuantity -> _state.update { state ->
+                state.copy(
+                    splits = state.splits.map { split ->
+                        if (split.id == event.splitId) {
+                            split.copy(
+                                units = event.quantity
+                            )
+                        } else
+                            split
+                    }
+                )
+            }
+
+            is TransactionFormEvent.SetTitle -> _state.update { it.copy(title = event.title) }
+            is TransactionFormEvent.SetTotal -> _state.update { state ->
+                state.copy(
+                    splits = state.splits.map { split ->
+                        if (split.id == event.splitId) {
+                            split.copy(
+                                totalText = event.total
+                            )
+                        } else
+                            split
+                    }
+                )
+            }
+
+            TransactionFormEvent.OpenAddProductModal -> _state.update {
+                it.copy(
+                    isAddProductModalOpen = true
+                )
+            }
+
+            TransactionFormEvent.OpenDateModal -> _state.update { it.copy(isDateModalOpen = true) }
+            TransactionFormEvent.OpenSelectAccountModal -> _state.update {
+                it.copy(
+                    isSelectAccountModalOpen = true
+                )
+            }
+
+            TransactionFormEvent.OpenSelectCategoryModal -> _state.update {
+                it.copy(
+                    isSelectCategoryModalOpen = true
+                )
+            }
+
+            TransactionFormEvent.DismissAddProductModal -> _state.update {
+                it.copy(
+                    isAddProductModalOpen = false
+                )
+            }
+
+            TransactionFormEvent.DismissDateModal -> _state.update { it.copy(isDateModalOpen = false) }
+            TransactionFormEvent.DismissSelectAccountModal -> _state.update {
+                it.copy(
+                    isSelectAccountModalOpen = false
+                )
+            }
+
+            TransactionFormEvent.DismissSelectCategoryModal -> _state.update {
+                it.copy(
+                    isSelectCategoryModalOpen = false
+                )
+            }
+
+            TransactionFormEvent.Save -> TODO()
+        }
+    }
+
+}

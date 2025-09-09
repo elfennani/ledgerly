@@ -34,6 +34,8 @@ import com.elfennani.ledgerly.presentation.scene.product_form.ProductFormRoute
 import com.elfennani.ledgerly.presentation.scene.product_form.ProductFormScreen
 import com.elfennani.ledgerly.presentation.scene.products.ProductListRoute
 import com.elfennani.ledgerly.presentation.scene.products.ProductListScreen
+import com.elfennani.ledgerly.presentation.scene.transaction_form.TransactionFormRoute
+import com.elfennani.ledgerly.presentation.scene.transaction_form.TransactionFormScreen
 import com.elfennani.ledgerly.presentation.scene.transactions.TransactionListRoute
 import com.elfennani.ledgerly.presentation.scene.transactions.TransactionListScreen
 import kotlin.math.roundToInt
@@ -158,6 +160,12 @@ fun Navigation() {
 
             composable<ProductFormRoute> {
                 ProductFormScreen(
+                    navController = navController
+                )
+            }
+
+            composable<TransactionFormRoute> {
+                TransactionFormScreen(
                     navController = navController
                 )
             }

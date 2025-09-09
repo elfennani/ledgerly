@@ -1,8 +1,10 @@
 package com.elfennani.ledgerly.presentation.component
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -28,31 +30,35 @@ fun AppScaffold(
 ) {
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                tabs.forEach { tab ->
-                    val isSelected = selected(tab)
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxWidth(),
+                visible = tabs.any { selected(it) }) {
+                NavigationBar {
+                    tabs.forEach { tab ->
+                        val isSelected = selected(tab)
 
-                    NavigationBarItem(
-                        icon = {
-                            Crossfade(
-                                targetState = isSelected,
-                                label = "Icon transition for ${tab.title}",
-                                animationSpec = tween(durationMillis = 250)
-                            ) { selected ->
-                                Icon(
-                                    painter = painterResource(id = if (selected) tab.selectedIcon else tab.icon),
-                                    contentDescription = tab.title
-                                )
+                        NavigationBarItem(
+                            icon = {
+                                Crossfade(
+                                    targetState = isSelected,
+                                    label = "Icon transition for ${tab.title}",
+                                    animationSpec = tween(durationMillis = 250)
+                                ) { selected ->
+                                    Icon(
+                                        painter = painterResource(id = if (selected) tab.selectedIcon else tab.icon),
+                                        contentDescription = tab.title
+                                    )
+                                }
+                            },
+                            label = { Text(tab.title) },
+                            selected = isSelected,
+                            onClick = {
+                                if (!isSelected) {
+                                    onTabSelected(tab)
+                                }
                             }
-                        },
-                        label = { Text(tab.title) },
-                        selected = isSelected,
-                        onClick = {
-                            if (!isSelected) {
-                                onTabSelected(tab)
-                            }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         },
