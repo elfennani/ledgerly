@@ -25,5 +25,4 @@ class TransactionListViewModel @Inject constructor(
             }
         }
     }
-
 }

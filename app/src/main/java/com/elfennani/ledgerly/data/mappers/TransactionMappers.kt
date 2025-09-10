@@ -4,6 +4,7 @@ import com.elfennani.ledgerly.data.local.entities.TransactionEntity
 import com.elfennani.ledgerly.data.local.entities.TransactionSplitEntity
 import com.elfennani.ledgerly.data.local.relations.SplitWithProduct
 import com.elfennani.ledgerly.data.local.relations.TransactionWithSplits
+import com.elfennani.ledgerly.domain.model.Account
 import com.elfennani.ledgerly.domain.model.Category
 import com.elfennani.ledgerly.domain.model.Product
 import com.elfennani.ledgerly.domain.model.Transaction
@@ -13,6 +14,7 @@ import java.time.Instant
 fun TransactionEntity.toDomain(
     splits: List<TransactionSplit>,
     category: Category,
+    account: Account
 ) = Transaction(
     id = id,
     date = Instant.ofEpochMilli(date),
@@ -20,7 +22,8 @@ fun TransactionEntity.toDomain(
     amount = amount,
     title = title,
     splits = splits,
-    category = category
+    category = category,
+    account = account
 )
 
 fun Transaction.toEntity() = TransactionEntity(
@@ -29,7 +32,8 @@ fun Transaction.toEntity() = TransactionEntity(
     description = description,
     amount = amount,
     title = title,
-    categoryId = category.id
+    categoryId = category.id,
+    accountId = account.id
 )
 
 fun TransactionSplitEntity.toDomain(product: Product) = TransactionSplit(
@@ -37,7 +41,7 @@ fun TransactionSplitEntity.toDomain(product: Product) = TransactionSplit(
     productId = productId,
     units = units,
     totalPrice = totalPrice,
-    product = product
+    product = product,
 )
 
 fun TransactionSplit.toEntity() = TransactionSplitEntity(
@@ -50,5 +54,6 @@ fun TransactionSplit.toEntity() = TransactionSplitEntity(
 fun SplitWithProduct.toDomain() = this.split.toDomain(product.toDomain())
 fun TransactionWithSplits.toDomain() = this.transaction.toDomain(
     splits = this.splits.map { it.toDomain() },
-    category = this.category.toDomain()
+    category = this.category.toDomain(),
+    account = this.account.toDomain()
 )

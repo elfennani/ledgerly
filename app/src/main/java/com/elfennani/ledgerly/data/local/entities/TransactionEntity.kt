@@ -11,5 +11,6 @@ data class TransactionEntity(
     val date: Long,
     val title: String,
     val description: String?,
-    val categoryId: Int
+    val categoryId: Int,
+    val accountId: Int
 )

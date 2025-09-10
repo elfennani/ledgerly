@@ -9,5 +9,6 @@ data class Transaction(
     val title: String,
     val description: String?,
     val category: Category,
-    val splits: List<TransactionSplit>
+    val splits: List<TransactionSplit>,
+    val account: Account
 )

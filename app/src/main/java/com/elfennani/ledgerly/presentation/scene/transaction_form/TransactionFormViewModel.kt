@@ -4,6 +4,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.elfennani.ledgerly.domain.model.Account
 import com.elfennani.ledgerly.domain.model.Transaction
 import com.elfennani.ledgerly.domain.model.TransactionSplit
 import com.elfennani.ledgerly.domain.usecase.CreateTransactionUseCase
@@ -303,7 +304,8 @@ class TransactionFormViewModel @Inject constructor(
                                     totalPrice = it.total,
                                     product = it.product
                                 )
-                            }
+                            },
+                            account = Account(id = 201, name = "Main Checking", balance = 1542.78),
                         )
                     )
                 }

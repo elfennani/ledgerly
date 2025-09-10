@@ -7,7 +7,7 @@ fun AccountEntity.toDomain() = Account(
     id = id,
     name = name,
     balance = balance,
-    description = description
+    description = description,
 )
 
 fun Account.toEntity() = AccountEntity(

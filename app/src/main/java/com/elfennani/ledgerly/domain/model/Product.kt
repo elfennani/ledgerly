@@ -5,6 +5,6 @@ data class Product(
     val name: String,
     val description: String? = "",
     val type: String,
-    val defaultUnit: String?,
+    val defaultUnit: String? = null,
     val pricePerUnit: Double? = 0.0,
 )

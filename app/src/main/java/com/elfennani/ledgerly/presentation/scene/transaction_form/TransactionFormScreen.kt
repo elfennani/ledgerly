@@ -486,12 +486,19 @@ private fun TransactionFormScreen(
     }
 }
 
-fun Instant.readable(): String? {
-    val formatter = DateTimeFormatter.ofPattern("EE, dd/MM/yyyy")
+fun Instant.readable(pattern: String): String {
+    val formatter = DateTimeFormatter.ofPattern(pattern)
     val formatted = LocalDateTime.ofInstant(this, ZoneId.systemDefault()).format(formatter)
-    return formatted
+    return formatted!!
 }
 
+fun Instant.readable(compact: Boolean = false): String {
+    return if (compact) {
+        readable("dd MMM")
+    } else {
+        readable("EE, dd/MM/yyyy")
+    }
+}
 
 @Preview
 @Composable
