@@ -1,5 +1,6 @@
 package com.elfennani.ledgerly.presentation.scene.transaction_form
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,12 +36,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +54,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -100,6 +107,7 @@ private fun TransactionFormScreen(
     onEvent: (TransactionFormEvent) -> Unit = {},
     onBack: () -> Unit = {},
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
     val productModalState = rememberModalBottomSheetState()
     val accountModalState = rememberModalBottomSheetState()
     val categoryModalState = rememberModalBottomSheetState()
@@ -109,6 +117,25 @@ private fun TransactionFormScreen(
     )
     val isDarkTheme = isSystemInDarkTheme()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            snackbarHostState.showSnackbar(
+                it,
+                duration = SnackbarDuration.Short,
+                withDismissAction = true
+            )
+            onEvent(TransactionFormEvent.ClearError)
+        }
+    }
+
+    LaunchedEffect(state.isSuccess) {
+        if (state.isSuccess) {
+            Toast.makeText(context, "Transaction saved", Toast.LENGTH_SHORT).show()
+            onBack()
+        }
+    }
 
     if (state.isDateModalOpen) {
         DatePickerModal(
@@ -180,6 +207,9 @@ private fun TransactionFormScreen(
                     }
                 }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { innerPadding ->
         HorizontalPager(

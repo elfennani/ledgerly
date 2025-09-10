@@ -23,6 +23,8 @@ data class TransactionFormUiState(
     val tab: TransactionFormTab = TransactionFormTab.SPLITS,
     val openSplitId: Int? = null,
     val error: String? = null,
+    val isSaving: Boolean = false,
+    val isSuccess: Boolean = false,
 
     // modals
     val isAddProductModalOpen: Boolean = false,

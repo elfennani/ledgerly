@@ -34,4 +34,5 @@ sealed class TransactionFormEvent {
     data object DismissSelectAccountModal : TransactionFormEvent()
     data object OpenSelectCategoryModal : TransactionFormEvent()
     data object DismissSelectCategoryModal : TransactionFormEvent()
+    data object ClearError : TransactionFormEvent()
 }

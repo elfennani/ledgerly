@@ -4,6 +4,9 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.elfennani.ledgerly.domain.model.Transaction
+import com.elfennani.ledgerly.domain.model.TransactionSplit
+import com.elfennani.ledgerly.domain.usecase.CreateTransactionUseCase
 import com.elfennani.ledgerly.domain.usecase.GetHomeOverviewUseCase
 import com.elfennani.ledgerly.domain.usecase.GetProductsUseCase
 import com.elfennani.ledgerly.presentation.scene.transaction_form.model.SplitItem
@@ -15,6 +18,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -22,6 +26,7 @@ import javax.inject.Inject
 class TransactionFormViewModel @Inject constructor(
     private val getProducts: GetProductsUseCase,
     private val getHomeOverviewUseCase: GetHomeOverviewUseCase,
+    private val createTransactionUseCase: CreateTransactionUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionFormUiState())
@@ -68,6 +73,12 @@ class TransactionFormViewModel @Inject constructor(
     fun onEvent(event: TransactionFormEvent) {
         when (event) {
             is TransactionFormEvent.AddProduct -> _state.update { state ->
+                if (state.splits.any { it.product.id == event.product.id }) {
+                    return@update state.copy(
+                        error = "Product \"${event.product.name}\" already added",
+                    )
+                }
+
                 state.copy(
                     splits = state.splits + SplitItem(
                         id = if (state.splits.isEmpty()) 0 else state.splits.maxOf { it.id } + 1,
@@ -222,7 +233,85 @@ class TransactionFormViewModel @Inject constructor(
                 )
             }
 
-            TransactionFormEvent.Save -> TODO()
+            TransactionFormEvent.Save -> {
+                val state = _state.value
+                if (state.title.text.isBlank()) {
+                    _state.update {
+                        it.copy(
+                            error = "Title cannot be empty",
+                        )
+                    }
+                    return
+                } else if (state.account == null) {
+                    _state.update {
+                        it.copy(
+                            error = "Please select an account",
+                        )
+                    }
+                    return
+                } else if (state.category == null) {
+                    _state.update {
+                        it.copy(
+                            error = "Please select a category",
+                        )
+                    }
+                    return
+                } else if (state.splits.isEmpty()) {
+                    _state.update {
+                        it.copy(
+                            error = "Please add at least one product",
+                        )
+                    }
+                    return
+                } else if (state.openSplitId != null) {
+                    _state.update {
+                        it.copy(
+                            error = "Please confirm all splits",
+                        )
+                    }
+                    return
+                } else if (state.date > Instant.now()) {
+                    _state.update {
+                        it.copy(
+                            error = "Date cannot be in the future",
+                        )
+                    }
+                    return
+                } else if (state.total == 0.00) {
+                    _state.update {
+                        it.copy(
+                            error = "Total cannot be zero",
+                        )
+                    }
+                    return
+                }
+
+                viewModelScope.launch {
+                    _state.update { it.copy(isSaving = true) }
+                    createTransactionUseCase(
+                        Transaction(
+                            amount = state.total,
+                            date = state.date,
+                            title = state.title.text,
+                            description = null,
+                            category = state.category,
+                            splits = state.splits.map {
+                                TransactionSplit(
+                                    transactionId = 0,
+                                    productId = it.product.id,
+                                    units = it.units,
+                                    totalPrice = it.total,
+                                    product = it.product
+                                )
+                            }
+                        )
+                    )
+                }
+
+                _state.update { it.copy(isSaving = false, isSuccess = true) }
+            }
+
+            TransactionFormEvent.ClearError -> _state.update { it.copy(error = null) }
         }
     }
 
