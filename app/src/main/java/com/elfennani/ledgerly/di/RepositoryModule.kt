@@ -4,10 +4,12 @@ import com.elfennani.ledgerly.data.repository.AccountRepositoryImpl
 import com.elfennani.ledgerly.data.repository.CategoryRepositoryImpl
 import com.elfennani.ledgerly.data.repository.GroupRepositoryImpl
 import com.elfennani.ledgerly.data.repository.ProductRepositoryImpl
+import com.elfennani.ledgerly.data.repository.TransactionRepositoryImpl
 import com.elfennani.ledgerly.domain.repository.AccountRepository
 import com.elfennani.ledgerly.domain.repository.CategoryRepository
 import com.elfennani.ledgerly.domain.repository.GroupRepository
 import com.elfennani.ledgerly.domain.repository.ProductRepository
+import com.elfennani.ledgerly.domain.repository.TransactionRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -36,4 +38,9 @@ abstract class RepositoryModule {
     abstract fun bindProductRepository(
         productRepositoryImpl: ProductRepositoryImpl
     ): ProductRepository
+
+    @Binds
+    abstract fun bindTransactionRepository(
+        transactionRepositoryImpl: TransactionRepositoryImpl
+    ): TransactionRepository
 }
