@@ -4,29 +4,63 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.elfennani.ledgerly.domain.usecase.GetHomeOverviewUseCase
 import com.elfennani.ledgerly.domain.usecase.GetProductsUseCase
 import com.elfennani.ledgerly.presentation.scene.transaction_form.model.SplitItem
 import com.elfennani.ledgerly.presentation.utils.pretty
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
 class TransactionFormViewModel @Inject constructor(
-    private val getProducts: GetProductsUseCase
+    private val getProducts: GetProductsUseCase,
+    private val getHomeOverviewUseCase: GetHomeOverviewUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionFormUiState())
     val state = _state.asStateFlow()
 
+
+    val now: Calendar = Calendar.getInstance()
+    val month = now.get(Calendar.MONTH)
+    val year = now.get(Calendar.YEAR)
+
     init {
         viewModelScope.launch {
             getProducts().first().let {
                 _state.update { state -> state.copy(products = it) }
+            }
+            getHomeOverviewUseCase(monthIndex = month, year).first().let { overview ->
+                _state.update { state ->
+                    state.copy(
+                        accounts = overview.accounts,
+                        categories = overview.groups.flatMap { it.categories ?: emptyList() }
+                    )
+                }
+            }
+
+            _state.distinctUntilChanged { old, new ->
+                val oldTotal = old.splits.fold(0.00) { acc, split ->
+                    acc + split.total
+                }
+                val newTotal = new.splits.fold(0.00) { acc, split ->
+                    acc + split.total
+                }
+
+                oldTotal == newTotal
+            }.collect {
+                _state.update {
+                    it.copy(total = it.splits.fold(0.00) { acc, split ->
+                        acc + split.total
+                    })
+                }
             }
         }
     }
@@ -46,7 +80,7 @@ class TransactionFormViewModel @Inject constructor(
                             text = event.product.pricePerUnit?.pretty ?: "",
                             selection = TextRange(event.product.pricePerUnit?.pretty?.length ?: 0)
                         )
-                    )
+                    ),
                 )
             }
 
@@ -55,7 +89,7 @@ class TransactionFormViewModel @Inject constructor(
 
                 if (split.totalText.text.toDoubleOrNull() == null) {
                     return@update state.copy(
-                        error = "Invalid total value for \"${split.product.name}\""
+                        error = "Invalid total value for \"${split.product.name}\"",
                     )
                 }
 
@@ -68,7 +102,7 @@ class TransactionFormViewModel @Inject constructor(
                             )
                         } else
                             split
-                    }
+                    },
                 )
             }
 
@@ -87,7 +121,7 @@ class TransactionFormViewModel @Inject constructor(
                             )
                         } else
                             split
-                    }
+                    },
                 )
             }
 
@@ -100,7 +134,7 @@ class TransactionFormViewModel @Inject constructor(
                             )
                         } else
                             split
-                    }
+                    },
                 )
             }
 
@@ -119,7 +153,7 @@ class TransactionFormViewModel @Inject constructor(
                             split.copy(isByUnit = event.isByUnit)
                         } else
                             split
-                    }
+                    },
                 )
             }
 
@@ -132,7 +166,7 @@ class TransactionFormViewModel @Inject constructor(
                             )
                         } else
                             split
-                    }
+                    },
                 )
             }
 
@@ -146,45 +180,45 @@ class TransactionFormViewModel @Inject constructor(
                             )
                         } else
                             split
-                    }
+                    },
                 )
             }
 
             TransactionFormEvent.OpenAddProductModal -> _state.update {
                 it.copy(
-                    isAddProductModalOpen = true
+                    isAddProductModalOpen = true,
                 )
             }
 
             TransactionFormEvent.OpenDateModal -> _state.update { it.copy(isDateModalOpen = true) }
             TransactionFormEvent.OpenSelectAccountModal -> _state.update {
                 it.copy(
-                    isSelectAccountModalOpen = true
+                    isSelectAccountModalOpen = true,
                 )
             }
 
             TransactionFormEvent.OpenSelectCategoryModal -> _state.update {
                 it.copy(
-                    isSelectCategoryModalOpen = true
+                    isSelectCategoryModalOpen = true,
                 )
             }
 
             TransactionFormEvent.DismissAddProductModal -> _state.update {
                 it.copy(
-                    isAddProductModalOpen = false
+                    isAddProductModalOpen = false,
                 )
             }
 
             TransactionFormEvent.DismissDateModal -> _state.update { it.copy(isDateModalOpen = false) }
             TransactionFormEvent.DismissSelectAccountModal -> _state.update {
                 it.copy(
-                    isSelectAccountModalOpen = false
+                    isSelectAccountModalOpen = false,
                 )
             }
 
             TransactionFormEvent.DismissSelectCategoryModal -> _state.update {
                 it.copy(
-                    isSelectCategoryModalOpen = false
+                    isSelectCategoryModalOpen = false,
                 )
             }
 

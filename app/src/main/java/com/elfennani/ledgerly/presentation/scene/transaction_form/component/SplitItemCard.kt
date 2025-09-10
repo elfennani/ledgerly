@@ -205,7 +205,7 @@ fun SplitItemCard(
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.primary
                             )
-                        }
+                        }// 0600050659
                     }
                 } else {
                     OutlinedTextField(

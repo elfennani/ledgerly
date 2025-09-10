@@ -1,5 +1,6 @@
 package com.elfennani.ledgerly.presentation.scene.transaction_form
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -49,8 +50,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.elfennani.ledgerly.R
@@ -58,12 +61,16 @@ import com.elfennani.ledgerly.domain.model.Account
 import com.elfennani.ledgerly.domain.model.Category
 import com.elfennani.ledgerly.domain.model.Product
 import com.elfennani.ledgerly.presentation.component.DatePickerModal
+import com.elfennani.ledgerly.presentation.scene.transaction_form.component.SelectAccountModal
+import com.elfennani.ledgerly.presentation.scene.transaction_form.component.SelectCategoryModal
 import com.elfennani.ledgerly.presentation.scene.transaction_form.component.SelectProductModal
 import com.elfennani.ledgerly.presentation.scene.transaction_form.component.SplitItemCard
 import com.elfennani.ledgerly.presentation.scene.transaction_form.model.SplitItem
 import com.elfennani.ledgerly.presentation.scene.transaction_form.model.TransactionFormTab
 import com.elfennani.ledgerly.presentation.theme.AppTheme
 import com.elfennani.ledgerly.presentation.utils.clickableTextField
+import com.elfennani.ledgerly.presentation.utils.excludeFirstEmoji
+import com.elfennani.ledgerly.presentation.utils.firstEmojiOrNull
 import com.elfennani.ledgerly.presentation.utils.plus
 import com.elfennani.ledgerly.presentation.utils.pretty
 import kotlinx.coroutines.launch
@@ -94,6 +101,8 @@ private fun TransactionFormScreen(
     onBack: () -> Unit = {},
 ) {
     val productModalState = rememberModalBottomSheetState()
+    val accountModalState = rememberModalBottomSheetState()
+    val categoryModalState = rememberModalBottomSheetState()
     val pagerState = rememberPagerState(
         if (state.tab == TransactionFormTab.SPLITS) 0 else 1,
         pageCount = { 2 }
@@ -126,6 +135,30 @@ private fun TransactionFormScreen(
             },
             onEvent = onEvent,
             products = state.products
+        )
+    }
+
+    if (state.isSelectAccountModalOpen) {
+        SelectAccountModal(
+            sheetState = accountModalState,
+            onDismissRequest = {
+                scope.launch { accountModalState.hide() }
+                    .invokeOnCompletion { onEvent(TransactionFormEvent.DismissSelectAccountModal) }
+            },
+            onEvent = onEvent,
+            accounts = state.accounts
+        )
+    }
+
+    if (state.isSelectCategoryModalOpen) {
+        SelectCategoryModal(
+            sheetState = categoryModalState,
+            onDismissRequest = {
+                scope.launch { categoryModalState.hide() }
+                    .invokeOnCompletion { onEvent(TransactionFormEvent.DismissSelectCategoryModal) }
+            },
+            onEvent = onEvent,
+            categories = state.categories
         )
     }
 
@@ -281,7 +314,7 @@ private fun TransactionFormScreen(
                                 .clickableTextField(Unit) {
                                     onEvent(TransactionFormEvent.OpenSelectAccountModal)
                                 },
-                            value = state.account?.name ?: "",
+                            value = state.account?.name ?: "Select Account",
                             onValueChange = {},
                             label = { Text("Account") },
                             readOnly = true,
@@ -294,41 +327,118 @@ private fun TransactionFormScreen(
                             }
                         )
 
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                                .fillMaxWidth()
-                                .clip(CircleShape)
-                                .clickable { onEvent(TransactionFormEvent.OpenSelectCategoryModal) }
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
-                                .padding(horizontal = 12.dp)
-                                .padding(end = 4.dp)
-                                .height(64.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(vertical = 12.dp)
-                                    .clip(CircleShape)
-                                    .fillMaxHeight()
-                                    .aspectRatio(1f)
-                                    .background(Color.Gray.copy(alpha = 0.12f))
-                                    .padding(8.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.pencil_square),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                        AnimatedContent(
+                            modifier = Modifier.fillMaxWidth(),
+                            targetState = state.category
+                        ) { category ->
+                            if (category == null) {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(top = 8.dp)
+                                        .fillMaxWidth()
+                                        .clip(CircleShape)
+                                        .clickable { onEvent(TransactionFormEvent.OpenSelectCategoryModal) }
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .padding(horizontal = 12.dp)
+                                        .padding(end = 4.dp)
+                                        .height(64.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(vertical = 12.dp)
+                                            .clip(CircleShape)
+                                            .fillMaxHeight()
+                                            .aspectRatio(1f)
+                                            .background(Color.Gray.copy(alpha = 0.12f))
+                                            .padding(8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.pencil_square),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    Text(
+                                        text = "Select Category",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                            } else {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(CircleShape)
+                                        .clickable { onEvent(TransactionFormEvent.OpenSelectCategoryModal) }
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .padding(horizontal = 12.dp)
+                                        .padding(end = 4.dp)
+                                        .height(64.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(vertical = 12.dp)
+                                            .clip(CircleShape)
+                                            .fillMaxHeight()
+                                            .aspectRatio(1f)
+                                            .background(Color.Gray.copy(alpha = 0.12f))
+                                            .padding(8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        val icon = category.name.firstEmojiOrNull()
+
+                                        if (icon != null) {
+                                            Text(
+                                                text = icon,
+                                                fontSize = 14.sp,
+                                                lineHeight = 14.sp,
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier
+                                                    .align(Alignment.Center)
+                                            )
+                                        } else {
+                                            Icon(
+                                                painter = painterResource(R.drawable.baseline_inventory_24),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(18.dp),
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(bottom = 4.dp),
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = category.name.excludeFirstEmoji(),
+                                                style = MaterialTheme.typography.titleMedium,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
+                                    }
+
+                                    Icon(
+                                        painter = painterResource(R.drawable.pencil_square),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+
                             }
-                            Text(
-                                text = "Select Category",
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.weight(1f)
-                            )
                         }
                     }
 
@@ -347,7 +457,7 @@ private fun TransactionFormScreen(
 }
 
 fun Instant.readable(): String? {
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val formatter = DateTimeFormatter.ofPattern("EE, dd/MM/yyyy")
     val formatted = LocalDateTime.ofInstant(this, ZoneId.systemDefault()).format(formatter)
     return formatted
 }
@@ -370,14 +480,13 @@ private fun TransactionFormScreenDetailsPreview() {
         TransactionFormScreen(
             state =
                 readyToUseTransactionFormUiState.copy(
-                    tab = TransactionFormTab.DETAILS
+                    tab = TransactionFormTab.DETAILS,
                 )
         )
     }
 }
 
 val readyToUseTransactionFormUiState = TransactionFormUiState(
-    isLoading = false,
     products = listOf(
         Product(
             id = 1,
@@ -412,7 +521,6 @@ val readyToUseTransactionFormUiState = TransactionFormUiState(
             pricePerUnit = 2.00
         )
     ),
-    openSplitId = 2,
     splits = listOf(
         SplitItem(
             id = 1,
@@ -464,7 +572,7 @@ val readyToUseTransactionFormUiState = TransactionFormUiState(
     total = 8.25,
     title = TextFieldValue("Weekly Grocery Run"),
     category = Category(id = 101, groupId = 1, name = "Groceries"),
-    date = Instant.now().minusSeconds(3600 * 24 * 3), // 3 days ago
+    date = Instant.now().minusSeconds(3600 * 24 * 3),
     account = Account(id = 201, name = "Checking Account", balance = 1250.75),
-    tab = TransactionFormTab.SPLITS
+    openSplitId = 2, // 3 days ago
 )

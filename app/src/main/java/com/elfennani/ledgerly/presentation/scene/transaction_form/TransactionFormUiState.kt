@@ -12,6 +12,8 @@ import java.time.Instant
 data class TransactionFormUiState(
     val isLoading: Boolean = false,
     val products: List<Product> = emptyList(),
+    val categories: List<Category> = emptyList(),
+    val accounts: List<Account> = emptyList(),
     val splits: List<SplitItem> = emptyList(),
     val total: Double = 0.00,
     val title: TextFieldValue = TextFieldValue(""),
@@ -26,5 +28,5 @@ data class TransactionFormUiState(
     val isAddProductModalOpen: Boolean = false,
     val isSelectAccountModalOpen: Boolean = false,
     val isSelectCategoryModalOpen: Boolean = false,
-    val isDateModalOpen: Boolean = false
+    val isDateModalOpen: Boolean = false,
 )
