@@ -87,89 +87,91 @@ private fun TransactionListScreen(
                 CircularProgressIndicator()
             }
         } else {
-            if (state.transactions.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text("No transactions yet")
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .consumeWindowInsets(innerPadding),
-                    contentPadding = innerPadding + PaddingValues(vertical = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(0.dp)
-                ) {
-                    item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.Top,
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-                            val actions = listOf(
-                                Triple(R.drawable.arrow_path, "Transfer") {},
-                                Triple(R.drawable.arrow_up_circle, "Top-up") {
-                                    onNavigateToTopUp()
-                                },
-                                Triple(R.drawable.document_text, "Record") {
-                                    onNavigateToTransactionForm()
-                                }
-                            )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .consumeWindowInsets(innerPadding),
+                contentPadding = innerPadding + PaddingValues(vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp)
+            ) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.Top,
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        val actions = listOf(
+                            Triple(R.drawable.arrow_path, "Transfer") {},
+                            Triple(R.drawable.arrow_up_circle, "Top-up") {
+                                onNavigateToTopUp()
+                            },
+                            Triple(R.drawable.document_text, "Record") {
+                                onNavigateToTransactionForm()
+                            }
+                        )
 
-                            actions.forEach { (icon, label, onClick) ->
-                                val interactionSource = remember { MutableInteractionSource() }
+                        actions.forEach { (icon, label, onClick) ->
+                            val interactionSource = remember { MutableInteractionSource() }
 
-                                Column(
+                            Column(
+                                modifier = Modifier
+                                    .clickable(
+                                        interactionSource = interactionSource,
+                                        indication = null
+                                    ) { onClick() },
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Box(
                                     modifier = Modifier
-                                        .clickable(
-                                            interactionSource = interactionSource,
-                                            indication = null
-                                        ) { onClick() },
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                                        .clip(MaterialTheme.shapes.medium)
+                                        .indication(interactionSource, indication = ripple())
+                                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                                        .padding(16.dp)
                                 ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(MaterialTheme.shapes.medium)
-                                            .indication(interactionSource, indication = ripple())
-                                            .background(MaterialTheme.colorScheme.secondaryContainer)
-                                            .padding(16.dp)
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(icon),
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onSecondaryContainer
-                                        )
-                                    }
-                                    Text(
-                                        label,
-                                        style = MaterialTheme.typography.labelLarge,
-                                        textAlign = TextAlign.Center
+                                    Icon(
+                                        painter = painterResource(icon),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSecondaryContainer
                                     )
                                 }
+                                Text(
+                                    label,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    textAlign = TextAlign.Center
+                                )
                             }
                         }
                     }
+                }
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        "Last Transactions",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
+                    )
+                }
+
+                if (state.transactions.isEmpty()) {
                     item {
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Text(
-                            "Last Transactions",
-                            style = MaterialTheme.typography.titleSmall,
-                            modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
-                        )
+                        Column(
+                            modifier = Modifier
+                                .padding(32.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text("No transactions yet")
+                        }
                     }
-                    items(state.transactions, key = { it.id }) { transaction ->
-                        TransactionCard(
-                            transaction = transaction,
-                            modifier = Modifier.animateItem()
-                        )
-                    }
+                }
+
+                items(state.transactions, key = { it.id }) { transaction ->
+                    TransactionCard(
+                        transaction = transaction,
+                        modifier = Modifier.animateItem()
+                    )
                 }
             }
         }

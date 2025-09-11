@@ -2,24 +2,38 @@ package com.elfennani.ledgerly.presentation.scene.top_up_form
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elfennani.ledgerly.domain.model.Account
 import com.elfennani.ledgerly.domain.model.Transaction
 import com.elfennani.ledgerly.domain.usecase.CreateTransactionUseCase
+import com.elfennani.ledgerly.domain.usecase.GetHomeOverviewUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
 class TopUpFormViewModel @Inject constructor(
-    private val createTransactionUseCase: CreateTransactionUseCase
+    private val createTransactionUseCase: CreateTransactionUseCase,
+    private val getHomeOverviewUseCase: GetHomeOverviewUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TopUpFormUiState())
     val state = _state.asStateFlow()
+
+    val now: Calendar = Calendar.getInstance()
+    val month = now.get(Calendar.MONTH)
+    val year = now.get(Calendar.YEAR)
+
+    init {
+        viewModelScope.launch {
+            getHomeOverviewUseCase(monthIndex = month, year).collect { overview ->
+                _state.update { it.copy(accounts = overview.accounts) }
+            }
+        }
+    }
 
     fun onEvent(event: TopUpFormEvent) {
         when (event) {
@@ -35,7 +49,7 @@ class TopUpFormViewModel @Inject constructor(
             TopUpFormEvent.OnOpenDateModal -> _state.update { it.copy(isDateModalOpen = true) }
             TopUpFormEvent.OnOpenSelectAccountModal -> _state.update {
                 it.copy(
-                    isSelectAccountModalOpen = false
+                    isSelectAccountModalOpen = true
                 )
             }
 
@@ -89,7 +103,7 @@ class TopUpFormViewModel @Inject constructor(
                             date = state.date,
                             title = state.title.text,
                             description = null,
-                            account = Account(id = 201, name = "Main Checking", balance = 1542.78),
+                            account = state.account
                         )
                     )
                 }
