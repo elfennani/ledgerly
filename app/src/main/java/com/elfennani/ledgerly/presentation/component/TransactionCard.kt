@@ -19,24 +19,31 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.domain.model.Transaction
 import com.elfennani.ledgerly.presentation.scene.transaction_form.readable
+import com.elfennani.ledgerly.presentation.scene.transactions.PreviewTransactions
+import com.elfennani.ledgerly.presentation.theme.AppTheme
 import com.elfennani.ledgerly.presentation.utils.pretty
 
 @Composable
-fun TransactionCard(modifier: Modifier = Modifier, transaction: Transaction) {
+fun TransactionCard(
+    modifier: Modifier = Modifier,
+    transaction: Transaction,
+    initialOpened: Boolean = false
+) {
     val isTopUp =
         false // Example condition for top-up, TODO: Replace with real condition
-    var opened by remember { mutableStateOf(false) }
+    var opened by rememberSaveable { mutableStateOf(initialOpened) }
     Column(
         modifier = modifier
             .fillMaxWidth(),
@@ -132,12 +139,12 @@ fun TransactionCard(modifier: Modifier = Modifier, transaction: Transaction) {
                     Column(Modifier.weight(1f)) {
                         Text(
                             "Account",
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             transaction.account.name,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleSmall,
                             maxLines = 1,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -145,12 +152,12 @@ fun TransactionCard(modifier: Modifier = Modifier, transaction: Transaction) {
                     Column(Modifier.weight(1f)) {
                         Text(
                             "Date",
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             transaction.date.readable("EE, dd/MM"),
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleSmall,
                             maxLines = 1,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -166,18 +173,22 @@ fun TransactionCard(modifier: Modifier = Modifier, transaction: Transaction) {
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
                     transaction.splits.forEach { split ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
                                 split.units.toString().padStart(2, '0'),
-                                style = MaterialTheme.typography.titleMedium.copy(
+                                style = MaterialTheme.typography.titleSmall.copy(
                                     fontFeatureSettings = "tnum"
                                 ),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                             )
-                            Text(split.product.name, modifier = Modifier.weight(1f))
+                            Text(
+                                split.product.name, modifier = Modifier.weight(1f),
+                                maxLines = 1,
+                                style = MaterialTheme.typography.titleSmall
+                            )
                             Text(
                                 "$${split.totalPrice.pretty}",
-                                style = MaterialTheme.typography.titleMedium.copy(
+                                style = MaterialTheme.typography.titleSmall.copy(
                                     fontFeatureSettings = "tnum"
                                 ),
                             )
@@ -185,6 +196,19 @@ fun TransactionCard(modifier: Modifier = Modifier, transaction: Transaction) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun TransactionCardPreview() {
+    AppTheme {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            TransactionCard(
+                transaction = PreviewTransactions.transactionList.first(),
+                initialOpened = true
+            )
         }
     }
 }
