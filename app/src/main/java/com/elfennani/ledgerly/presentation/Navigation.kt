@@ -34,6 +34,8 @@ import com.elfennani.ledgerly.presentation.scene.product_form.ProductFormRoute
 import com.elfennani.ledgerly.presentation.scene.product_form.ProductFormScreen
 import com.elfennani.ledgerly.presentation.scene.products.ProductListRoute
 import com.elfennani.ledgerly.presentation.scene.products.ProductListScreen
+import com.elfennani.ledgerly.presentation.scene.top_up_form.TopUpFormRoute
+import com.elfennani.ledgerly.presentation.scene.top_up_form.TopUpFormScreen
 import com.elfennani.ledgerly.presentation.scene.transaction_form.TransactionFormRoute
 import com.elfennani.ledgerly.presentation.scene.transaction_form.TransactionFormScreen
 import com.elfennani.ledgerly.presentation.scene.transactions.TransactionListRoute
@@ -147,28 +149,12 @@ fun Navigation() {
             ) {
                 TransactionListScreen(navController = navController)
             }
-            composable<GroupsRoute> {
-                GroupsScreen(
-                    navController = navController
-                )
-            }
-            composable<CategoryRoute> {
-                CategoryScreen(
-                    navController = navController
-                )
-            }
 
-            composable<ProductFormRoute> {
-                ProductFormScreen(
-                    navController = navController
-                )
-            }
-
-            composable<TransactionFormRoute> {
-                TransactionFormScreen(
-                    navController = navController
-                )
-            }
+            composable<GroupsRoute> { GroupsScreen(navController = navController) }
+            composable<CategoryRoute> { CategoryScreen(navController = navController) }
+            composable<ProductFormRoute> { ProductFormScreen(navController = navController) }
+            composable<TransactionFormRoute> { TransactionFormScreen(navController = navController) }
+            composable<TopUpFormRoute> { TopUpFormScreen(navController) }
         }
     }
 }

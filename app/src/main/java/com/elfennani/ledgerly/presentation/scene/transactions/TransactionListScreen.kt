@@ -40,6 +40,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.elfennani.ledgerly.R
 import com.elfennani.ledgerly.presentation.component.TransactionCard
+import com.elfennani.ledgerly.presentation.scene.top_up_form.TopUpFormRoute
 import com.elfennani.ledgerly.presentation.scene.transaction_form.TransactionFormRoute
 import com.elfennani.ledgerly.presentation.theme.AppTheme
 import com.elfennani.ledgerly.presentation.utils.plus
@@ -54,6 +55,9 @@ fun TransactionListScreen(
         state = state,
         onNavigateToTransactionForm = {
             navController.navigate(TransactionFormRoute)
+        },
+        onNavigateToTopUp = {
+            navController.navigate(TopUpFormRoute)
         }
     )
 }
@@ -62,7 +66,8 @@ fun TransactionListScreen(
 @Composable
 private fun TransactionListScreen(
     state: TransactionListUiState = TransactionListUiState(),
-    onNavigateToTransactionForm: () -> Unit = { }
+    onNavigateToTransactionForm: () -> Unit = { },
+    onNavigateToTopUp: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -109,7 +114,9 @@ private fun TransactionListScreen(
                         ) {
                             val actions = listOf(
                                 Triple(R.drawable.arrow_path, "Transfer") {},
-                                Triple(R.drawable.arrow_up_circle, "Top-up") {},
+                                Triple(R.drawable.arrow_up_circle, "Top-up") {
+                                    onNavigateToTopUp()
+                                },
                                 Triple(R.drawable.document_text, "Record") {
                                     onNavigateToTransactionForm()
                                 }

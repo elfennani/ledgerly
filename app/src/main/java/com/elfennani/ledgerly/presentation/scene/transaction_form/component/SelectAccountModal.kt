@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.elfennani.ledgerly.domain.model.Account
-import com.elfennani.ledgerly.presentation.scene.transaction_form.TransactionFormEvent
 import com.elfennani.ledgerly.presentation.theme.AppTheme
 import com.elfennani.ledgerly.presentation.utils.pretty
 
@@ -36,7 +35,7 @@ fun SelectAccountModal(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(false),
     onDismissRequest: () -> Unit = {},
-    onEvent: (TransactionFormEvent) -> Unit = {},
+    onClickAccount: (Account) -> Unit = {},
     accounts: List<Account> = emptyList()
 ) {
     ModalBottomSheet(
@@ -71,7 +70,7 @@ fun SelectAccountModal(
                             .clip(MaterialTheme.shapes.medium)
                             .clickable {
                                 onDismissRequest()
-                                onEvent(TransactionFormEvent.SetAccount(account))
+                                onClickAccount(account)
                             }
                             .background(
                                 MaterialTheme.colorScheme.surfaceContainer,

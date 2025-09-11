@@ -172,7 +172,7 @@ private fun TransactionFormScreen(
                 scope.launch { accountModalState.hide() }
                     .invokeOnCompletion { onEvent(TransactionFormEvent.DismissSelectAccountModal) }
             },
-            onEvent = onEvent,
+            onClickAccount = { account -> onEvent(TransactionFormEvent.SetAccount(account)) },
             accounts = state.accounts
         )
     }

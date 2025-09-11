@@ -40,7 +40,8 @@ fun Transaction.toEntity() = TransactionEntity(
     amount = amount,
     title = title,
     categoryId = if (this is Transaction.Outflow) this.category.id else null,
-    accountId = account.id
+    accountId = account.id,
+    isTopUp = this is Transaction.Inflow
 )
 
 fun TransactionSplitEntity.toDomain(product: Product) = TransactionSplit(
