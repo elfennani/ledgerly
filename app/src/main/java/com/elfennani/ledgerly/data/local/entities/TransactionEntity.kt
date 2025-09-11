@@ -1,5 +1,6 @@
 package com.elfennani.ledgerly.data.local.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -11,6 +12,8 @@ data class TransactionEntity(
     val date: Long,
     val title: String,
     val description: String?,
-    val categoryId: Int,
-    val accountId: Int
+    val categoryId: Int?,
+    val accountId: Int,
+    @ColumnInfo(defaultValue = "0")
+    val isTopUp: Boolean = false
 )

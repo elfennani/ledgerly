@@ -13,16 +13,23 @@ import java.time.Instant
 
 fun TransactionEntity.toDomain(
     splits: List<TransactionSplit>,
-    category: Category,
+    category: Category?,
     account: Account
-) = Transaction(
+) = if (isTopUp) Transaction.Inflow(
+    id = id,
+    date = Instant.ofEpochMilli(date),
+    description = description,
+    amount = amount,
+    title = title,
+    account = account
+) else Transaction.Outflow(
     id = id,
     date = Instant.ofEpochMilli(date),
     description = description,
     amount = amount,
     title = title,
     splits = splits,
-    category = category,
+    category = category!!,
     account = account
 )
 
@@ -32,7 +39,7 @@ fun Transaction.toEntity() = TransactionEntity(
     description = description,
     amount = amount,
     title = title,
-    categoryId = category.id,
+    categoryId = if (this is Transaction.Outflow) this.category.id else null,
     accountId = account.id
 )
 
@@ -54,6 +61,6 @@ fun TransactionSplit.toEntity() = TransactionSplitEntity(
 fun SplitWithProduct.toDomain() = this.split.toDomain(product.toDomain())
 fun TransactionWithSplits.toDomain() = this.transaction.toDomain(
     splits = this.splits.map { it.toDomain() },
-    category = this.category.toDomain(),
+    category = this.category?.toDomain(),
     account = this.account.toDomain()
 )

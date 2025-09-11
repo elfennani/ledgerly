@@ -290,7 +290,7 @@ class TransactionFormViewModel @Inject constructor(
                 viewModelScope.launch {
                     _state.update { it.copy(isSaving = true) }
                     createTransactionUseCase(
-                        Transaction(
+                        Transaction.Outflow(
                             amount = state.total,
                             date = state.date,
                             title = state.title.text,

@@ -22,17 +22,19 @@ class TransactionRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addTransaction(transaction: Transaction) {
-        transactionDao.upsertTransactionWithSplits(
-            transaction = transaction.toEntity(),
-            splits = transaction.splits.map { it.toEntity() }
-        )
+        if (transaction is Transaction.Outflow)
+            transactionDao.upsertTransactionWithSplits(
+                transaction = transaction.toEntity(),
+                splits = transaction.splits.map { it.toEntity() }
+            )
+        else
+            transactionDao.upsertTransaction(
+                transaction.toEntity()
+            )
     }
 
     override suspend fun updateTransaction(transaction: Transaction) {
-        transactionDao.upsertTransactionWithSplits(
-            transaction = transaction.toEntity(),
-            splits = transaction.splits.map { it.toEntity() }
-        )
+        addTransaction(transaction)
     }
 
     override suspend fun deleteTransaction(id: Int) {

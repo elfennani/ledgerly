@@ -42,8 +42,9 @@ fun TransactionCard(
     initialOpened: Boolean = false
 ) {
     val isTopUp =
-        false // Example condition for top-up, TODO: Replace with real condition
+        transaction is Transaction.Inflow
     var opened by rememberSaveable { mutableStateOf(initialOpened) }
+
     Column(
         modifier = modifier
             .fillMaxWidth(),
@@ -81,8 +82,11 @@ fun TransactionCard(
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = transaction.category.name,
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = when (transaction) {
+                        is Transaction.Inflow -> "@${transaction.account.name}"
+                        is Transaction.Outflow -> transaction.category.name
+                    },
+                    style = MaterialTheme.typography.bodyMedium.copy(fontFeatureSettings = "calt"),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
                         alpha = 0.7f
                     )
@@ -105,7 +109,6 @@ fun TransactionCard(
                 )
             }
         }
-
 
 
         AnimatedVisibility(opened, modifier = Modifier.fillMaxWidth()) {
@@ -163,35 +166,37 @@ fun TransactionCard(
                         )
                     }
                 }
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        "Items Bought",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    transaction.splits.forEach { split ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(
-                                split.units.toString().padStart(2, '0'),
-                                style = MaterialTheme.typography.titleSmall.copy(
-                                    fontFeatureSettings = "tnum"
-                                ),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                            )
-                            Text(
-                                split.product.name, modifier = Modifier.weight(1f),
-                                maxLines = 1,
-                                style = MaterialTheme.typography.titleSmall
-                            )
-                            Text(
-                                "$${split.totalPrice.pretty}",
-                                style = MaterialTheme.typography.titleSmall.copy(
-                                    fontFeatureSettings = "tnum"
-                                ),
-                            )
+                if (transaction is Transaction.Outflow) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            "Items Bought",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        transaction.splits.forEach { split ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Text(
+                                    split.units.toString().padStart(2, '0'),
+                                    style = MaterialTheme.typography.titleSmall.copy(
+                                        fontFeatureSettings = "tnum"
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                )
+                                Text(
+                                    split.product.name, modifier = Modifier.weight(1f),
+                                    maxLines = 1,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Text(
+                                    "$${split.totalPrice.pretty}",
+                                    style = MaterialTheme.typography.titleSmall.copy(
+                                        fontFeatureSettings = "tnum"
+                                    ),
+                                )
+                            }
                         }
                     }
                 }
@@ -206,7 +211,20 @@ private fun TransactionCardPreview() {
     AppTheme {
         Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
             TransactionCard(
-                transaction = PreviewTransactions.transactionList.first(),
+                transaction = PreviewTransactions.transactionList.find { it is Transaction.Outflow }!!,
+                initialOpened = true
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun TransactionCardInFlowPreview() {
+    AppTheme {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            TransactionCard(
+                transaction = PreviewTransactions.transactionList.find { it is Transaction.Inflow }!!,
                 initialOpened = true
             )
         }

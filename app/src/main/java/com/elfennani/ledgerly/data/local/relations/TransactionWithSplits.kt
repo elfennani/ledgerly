@@ -21,7 +21,7 @@ data class TransactionWithSplits(
         parentColumn = "categoryId",
         entityColumn = "id"
     )
-    val category: CategoryEntity,
+    val category: CategoryEntity?,
 
     @Relation(
         parentColumn = "accountId",
