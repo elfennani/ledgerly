@@ -10,17 +10,25 @@ class GetHomeOverviewUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
     private val getGroupsUseCase: GetGroupsUseCase,
     private val categoryRepository: CategoryRepository,
-    private val getBudgetDataUseCase: GetBudgetDataUseCase
+    private val getBudgetDataUseCase: GetBudgetDataUseCase,
+    private val getTransactionsUseCase: GetTransactionsUseCase,
 ) {
     operator fun invoke(monthIndex: Int, year: Int) =
         combine(
             accountRepository.accountListFlow,
             getGroupsUseCase(),
             categoryRepository.getCategoryBudgetsFlow(),
-            getBudgetDataUseCase(monthIndex, year)
-        ) { accounts, groups, budgets, budgetData ->
+            getBudgetDataUseCase(monthIndex, year),
+            getTransactionsUseCase()
+        ) { accounts, groups, budgets, budgetData, transactions ->
             HomeOverview(
-                accounts = accounts,
+                accounts = accounts.map { account ->
+                    account.copy(
+                        transactions = transactions
+                            .filter { it.account.id == account.id }
+                            .sortedByDescending { it.date.toEpochMilli() }
+                    )
+                },
                 budgetData = budgetData,
                 groups = groups.sortedBy { it.index }.map { group ->
                     group.copy(

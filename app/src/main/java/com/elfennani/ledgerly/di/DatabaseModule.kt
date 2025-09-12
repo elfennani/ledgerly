@@ -18,34 +18,34 @@ import javax.inject.Singleton
 object DatabaseModule {
 
     val MIGRATION_7_8 = object : Migration(7, 8) {
-        override fun migrate(database: SupportSQLiteDatabase) {
+        override fun migrate(db: SupportSQLiteDatabase) {
             var firstAccountId: Int? = null
-            database.query("SELECT * FROM accounts LIMIT 1").use { cursor ->
+            db.query("SELECT * FROM accounts LIMIT 1").use { cursor ->
                 if (cursor.moveToFirst()) {
                     firstAccountId = cursor.getIntOrNull(cursor.getColumnIndexOrThrow("id"))
                 }
             }
             if (firstAccountId != null)
-                database.execSQL("ALTER TABLE transactions ADD COLUMN accountId INTEGER NOT NULL DEFAULT $firstAccountId")
+                db.execSQL("ALTER TABLE transactions ADD COLUMN accountId INTEGER NOT NULL DEFAULT $firstAccountId")
             else {
-                database.execSQL("DELETE FROM transactions")
-                database.execSQL("ALTER TABLE transactions ADD COLUMN accountId INTEGER NOT NULL")
+                db.execSQL("DELETE FROM transactions")
+                db.execSQL("ALTER TABLE transactions ADD COLUMN accountId INTEGER NOT NULL")
             }
         }
     }
 
     val MIGRATION_9_10 = object : Migration(9, 10) {
-        override fun migrate(database: SupportSQLiteDatabase) {
+        override fun migrate(db: SupportSQLiteDatabase) {
             var firstAccountId: Int? = null
-            database.query("SELECT * FROM accounts LIMIT 1").use { cursor ->
+            db.query("SELECT * FROM accounts LIMIT 1").use { cursor ->
                 if (cursor.moveToFirst()) {
                     firstAccountId = cursor.getIntOrNull(cursor.getColumnIndexOrThrow("id"))
                 }
             }
             if (firstAccountId != null)
-                database.execSQL("UPDATE transactions SET accountId=$firstAccountId WHERE accountId=201")
+                db.execSQL("UPDATE transactions SET accountId=$firstAccountId WHERE accountId=201")
             else {
-                database.execSQL("DELETE FROM transactions WHERE accountId=201")
+                db.execSQL("DELETE FROM transactions WHERE accountId=201")
             }
         }
     }
