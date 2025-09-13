@@ -1,6 +1,7 @@
 package com.elfennani.ledgerly.domain.usecase
 
 import com.elfennani.ledgerly.domain.model.HomeOverview
+import com.elfennani.ledgerly.domain.model.Transaction
 import com.elfennani.ledgerly.domain.repository.AccountRepository
 import com.elfennani.ledgerly.domain.repository.CategoryRepository
 import kotlinx.coroutines.flow.combine
@@ -24,6 +25,11 @@ class GetHomeOverviewUseCase @Inject constructor(
             HomeOverview(
                 accounts = accounts.map { account ->
                     account.copy(
+                        balance = transactions
+                            .filter { it.account.id == account.id }
+                            .fold(account.balance) { acc, transaction ->
+                                acc + (transaction.amount * (if (transaction is Transaction.Outflow) -1 else 1))
+                            },
                         transactions = transactions
                             .filter { it.account.id == account.id }
                             .sortedByDescending { it.date.toEpochMilli() }

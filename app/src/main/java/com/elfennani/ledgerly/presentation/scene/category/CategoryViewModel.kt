@@ -7,9 +7,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.elfennani.ledgerly.domain.model.Transaction
 import com.elfennani.ledgerly.domain.usecase.DeleteCategoryUseCase
 import com.elfennani.ledgerly.domain.usecase.GetBudgetDataUseCase
 import com.elfennani.ledgerly.domain.usecase.GetCategoryUseCase
+import com.elfennani.ledgerly.domain.usecase.GetTransactionsUseCase
 import com.elfennani.ledgerly.domain.usecase.SetCategoryBudgetUseCase
 import com.elfennani.ledgerly.domain.usecase.SetCategoryTargetUseCase
 import com.elfennani.ledgerly.domain.usecase.UpdateCategoryNameUseCase
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.ZoneId
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -34,6 +37,7 @@ class CategoryViewModel @Inject constructor(
     private val updateCategoryName: UpdateCategoryNameUseCase,
     private val deleteCategory: DeleteCategoryUseCase,
     private val getBudgetData: GetBudgetDataUseCase,
+    private val getTransactions: GetTransactionsUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -50,17 +54,31 @@ class CategoryViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 getCategory(route.categoryId),
-                getBudgetData(month, year)
-            ) { groupCategory, budgetData ->
-                if (groupCategory != null)
+                getBudgetData(month, year),
+                getTransactions()
+            ) { groupCategory, budgetData, transactions ->
+                if (groupCategory != null) {
+                    val (group, category) = groupCategory
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            category = groupCategory.second,
-                            group = groupCategory.first,
+                            category = category.copy(
+                                budgets = category.budgets.map { budget ->
+                                    budget.copy(
+                                        spent = transactions.filter { tx ->
+                                            val zone = tx.date.atZone(ZoneId.systemDefault())
+                                            zone.monthValue - 1 == month && zone.year == year && tx is Transaction.Outflow && tx.category.id == category.id
+                                        }.fold(0.00) { acc, tx ->
+                                            acc + tx.amount
+                                        }
+                                    )
+                                }
+                            ),
+                            group = group,
                             budgetData = budgetData
                         )
                     }
+                }
             }.collect {}
         }
     }

@@ -6,4 +6,5 @@ data class CategoryBudget(
     val year: Int,
     val target: Double?,
     val budget: Double?,
+    val spent: Double? = null
 )

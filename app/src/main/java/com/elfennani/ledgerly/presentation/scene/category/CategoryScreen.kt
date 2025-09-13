@@ -281,7 +281,8 @@ private fun CategoryScreen(
                             if (budgetForMonth?.target == null)
                                 0f
                             else {
-                                12f / budgetForMonth!!.target!!.toFloat()
+                                (budgetForMonth?.spent
+                                    ?: 0.00).toFloat() / budgetForMonth!!.target!!.toFloat()
                             }
                         },
                         modifier = Modifier
@@ -310,8 +311,8 @@ private fun CategoryScreen(
                     Text(
                         when {
                             budgetForMonth?.target == null -> "No Target Set"
-                            budgetForMonth?.budget == null -> "Spent $${12.00.pretty} of $${budgetForMonth!!.target!!.pretty}"
-                            else -> "Remaining $${(budgetForMonth!!.budget!! - 12).pretty} of $${budgetForMonth!!.budget!!.pretty} budget • $${12.00.pretty} of $${budgetForMonth!!.target!!.pretty} target"
+                            budgetForMonth?.budget == null -> "Spent $${(budgetForMonth?.spent ?: 0.00).pretty} of $${budgetForMonth!!.target!!.pretty}"
+                            else -> "Remaining $${(budgetForMonth!!.budget!! - (budgetForMonth?.spent ?: 0.00)).pretty} of $${budgetForMonth!!.budget!!.pretty} budget • $${(budgetForMonth?.spent ?: 0.00).pretty} of $${budgetForMonth!!.target!!.pretty} target"
                         },
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier
