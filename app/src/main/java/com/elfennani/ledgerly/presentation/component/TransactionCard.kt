@@ -1,6 +1,11 @@
 package com.elfennani.ledgerly.presentation.component
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -26,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.elfennani.ledgerly.R
@@ -77,10 +84,35 @@ fun TransactionCard(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    transaction.title,
-                    style = MaterialTheme.typography.titleMedium
-                )
+                var isTextOverflowing by remember { mutableStateOf(false) }
+                AnimatedContent(
+                    opened && isTextOverflowing,
+                    transitionSpec = {
+                        expandVertically(
+                            expandFrom = Alignment.Top,
+                            animationSpec = tween(220, delayMillis = 90)
+                        ).togetherWith(
+                            shrinkVertically(
+                                shrinkTowards = Alignment.Top,
+                                animationSpec = tween(
+                                    220,
+                                    delayMillis = 90
+                                )
+                            )
+                        )
+                    }
+                ) { opened ->
+                    Text(
+                        transaction.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = if (opened) Int.MAX_VALUE else 1,
+                        overflow = TextOverflow.Ellipsis,
+                        onTextLayout = {
+                            if (!isTextOverflowing && it.didOverflowHeight)
+                                isTextOverflowing = true
+                        }
+                    )
+                }
                 Text(
                     text = when (transaction) {
                         is Transaction.Inflow -> "@${transaction.account.name}"
@@ -224,7 +256,9 @@ private fun TransactionCardInFlowPreview() {
     AppTheme {
         Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
             TransactionCard(
-                transaction = PreviewTransactions.transactionList.find { it is Transaction.Inflow }!!,
+                transaction = (PreviewTransactions.transactionList.find { it is Transaction.Inflow }!! as Transaction.Inflow).copy(
+                    title = "Morning Bread aenfie oimfoe oemfoem omfeomf"
+                ),
                 initialOpened = true
             )
         }

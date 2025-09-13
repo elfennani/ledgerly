@@ -50,6 +50,22 @@ object DatabaseModule {
         }
     }
 
+    val MIGRATION_10_11 = object : Migration(10, 11) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            var firstAccountId: Int? = null
+            db.query("SELECT * FROM accounts LIMIT 1").use { cursor ->
+                if (cursor.moveToFirst()) {
+                    firstAccountId = cursor.getIntOrNull(cursor.getColumnIndexOrThrow("id"))
+                }
+            }
+            if (firstAccountId != null)
+                db.execSQL("UPDATE transactions SET accountId=$firstAccountId WHERE accountId=201")
+            else {
+                db.execSQL("DELETE FROM transactions WHERE accountId=201")
+            }
+        }
+    }
+
     @Provides
     @Singleton
     fun provideDatabase(
@@ -59,6 +75,7 @@ object DatabaseModule {
             .fallbackToDestructiveMigration(false)
             .addMigrations(MIGRATION_7_8)
             .addMigrations(MIGRATION_9_10)
+            .addMigrations(MIGRATION_10_11)
             .build()
     }
 

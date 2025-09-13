@@ -170,7 +170,7 @@ private fun TransactionListScreen(
                 items(state.transactions, key = { it.id }) { transaction ->
                     TransactionCard(
                         transaction = transaction,
-                        modifier = Modifier.animateItem()
+                        modifier = Modifier
                     )
                 }
             }
